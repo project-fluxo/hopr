@@ -34,8 +34,6 @@ PRIVATE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! GLOBAL VARIABLES 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Private Part ---------------------------------------------------------------------------------------------------------------------
-! Public Part ----------------------------------------------------------------------------------------------------------------------
 
 INTERFACE WriteMeshToHDF5
   MODULE PROCEDURE WriteMeshToHDF5
@@ -74,7 +72,6 @@ CHARACTER(LEN=*),INTENT(IN)    :: FileString  ! ?
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
-
 TYPE(tElem),POINTER            :: Elem  ! ?
 TYPE(tSide),POINTER            :: Side  ! ?
 INTEGER                        :: ElemID,SideID,NodeID  ! ?
@@ -383,7 +380,6 @@ USE MOD_Mesh_Vars,ONLY:tElem,tSide
 USE MOD_Mesh_Vars,ONLY:FirstElem
 USE MOD_Mesh_Vars,ONLY:N
 USE MOD_Mesh_Basis,ONLY:ISORIENTED
-! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! INPUT VARIABLES
@@ -578,7 +574,6 @@ USE MOD_Mesh_Vars,ONLY:AdaptedMesh
 USE MOD_Output_Vars,ONLY:DebugVisu,dosortijk,sfc_boundbox
 USE MOD_SpaceFillingCurve,ONLY:SortElemsBySpaceFillingCurve
 USE MOD_sortIJK,ONLY:SortElemsByCoords
-! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! INPUT VARIABLES
@@ -659,7 +654,6 @@ SUBROUTINE WriteArrayToHDF5(Loc_ID,ArrayName,Rank,nVal,RealArray,IntegerArray,St
 ! Subroutine to write Data to HDF5 format (ONLY FOR SINGLE USE)
 !===================================================================================================================================
 ! MODULES
-! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! INPUT VARIABLES

@@ -31,6 +31,7 @@ PUBLIC
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! GLOBAL VARIABLES 
 LOGICAL             :: useVMEC
+LOGICAL             :: useSFL                    !use straight-field line coordinates
 CHARACTER(LEN = 256):: VMECdataFile
 INTEGER,ALLOCATABLE :: xmAbs(:)                  ! abs |xm(iMode)|
 REAL,ALLOCATABLE    :: Psi_prof(:)               ! TOROIDAL flux profile (called phi_pf in VMEC)

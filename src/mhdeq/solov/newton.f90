@@ -42,6 +42,10 @@ INTERFACE NewtonRoot1D
   MODULE PROCEDURE NewtonRoot1D 
 END INTERFACE
 
+INTERFACE NewtonRoot1D_FdF
+  MODULE PROCEDURE NewtonRoot1D_FdF
+END INTERFACE
+
 INTERFACE NewtonMin2D 
   MODULE PROCEDURE NewtonMin2D 
 END INTERFACE
@@ -52,6 +56,12 @@ ABSTRACT INTERFACE
     REAL :: x
     REAL :: y1x1
   END FUNCTION i_f1x1
+
+  FUNCTION i_f2x1(x) RESULT (y2x1)
+    IMPLICIT NONE
+    REAL :: x
+    REAL :: y2x1(2)
+  END FUNCTION i_f2x1
 
   FUNCTION i_f1x2(x) RESULT (y1x2)
     IMPLICIT NONE
@@ -145,6 +155,48 @@ IF(.NOT.converged) STOP 'NewtonRoot1D not converged'
 xout=x
 
 END FUNCTION NewtonRoot1D
+
+
+FUNCTION NewtonRoot1D_FdF(tol,a,b,xin,F0,FRdFR) RESULT (xout)
+!===================================================================================================================================
+! Newton's iterative algorithm to find the root of function FR(x(:)) in the interval [a(:),b(:)], using d/dx(:)F(x)=0 and the derivative 
+!===================================================================================================================================
+! MODULES
+! IMPLICIT VARIABLE HANDLING
+IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT VARIABLES
+REAL   ,INTENT(IN) :: tol
+REAL   ,INTENT(IN) :: a,b
+REAL   ,INTENT(IN) :: F0     ! function to find root is FR(x)-F0 
+REAL   ,INTENT(IN) :: xin    !initial guess on input
+!-----------------------------------------------------------------------------------------------------------------------------------
+! OUTPUT VARIABLES
+PROCEDURE(i_f2x1)  :: FRdFR     ! function to find root f(x) & derivative d/dx f(x)
+REAL               :: xout    ! output x for f(x)=0
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+INTEGER             :: iter,maxiter
+REAL                :: x,dx
+REAL                :: FRdFRx(2) !1: FR(x), 2: dFR(x)
+LOGICAL             :: converged
+!===================================================================================================================================
+
+converged=.FALSE.
+x=xin
+maxiter=50
+DO iter=1,maxiter
+  FRdFRx=FRdFR(x)
+  dx=-(FRdFRx(1)-F0)/FRdFRx(2)
+  dx = MAX(-(x-a),MIN(b-x,dx)) !respect bounds
+  x = x+dx
+  converged=(ABS(dx).LT.tol).AND.(x.GT.a).AND.(x.LT.b)
+  IF(converged) EXIT
+END DO !iter
+IF(.NOT.converged) STOP 'NewtonRoot1D not converged'
+xout=x
+
+END FUNCTION NewtonRoot1D_FdF
 
 
 FUNCTION NewtonMin2D(tol,a,b,x,FF,dFF,ddFF) RESULT (fmin)

@@ -96,19 +96,22 @@ END SELECT
     ALLOCATE(RhoCoefs(nRhoCoefs))
     RhoCoefs=GETREALARRAY("RhoCoefs",nRhoCoefs)
   END IF
+  InputCoordSys=GETINT("MHDEQ_inputCoordSys","0")
+  ! =0: x_in(1:3) are (x,y,z) coordinates in a cylinder of size r=[0;1], z=[0;1]
+  ! =1: x_in(1:3) are (r,zeta,theta) coordinates r= [0;1], zeta= [0;1], theta=[0;1]
 
 WRITE(UNIT_stdOut,'(A)')'... DONE'
 END SUBROUTINE InitMHDEQ
 
 
-SUBROUTINE MapToMHDEQ(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
+SUBROUTINE MapToMHDEQ(nTotal,x_in,x_out,MHDEQdata)
 !===================================================================================================================================
 ! Maps a cylinder (r,z,phi) to a toroidal closed flux surface configuration derived from VMEC data. 
 ! Surfaces with constant r become flux surfaces. z [0;1] is mapped to [0;2*pi] 
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
-USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,whichEquilibrium
+USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,whichEquilibrium,InputCoordSys
 USE MOD_VMEC, ONLY:MapToVMEC
 USE MOD_Solov, ONLY:MapToSolov
 ! IMPLICIT VARIABLE HANDLING
@@ -117,8 +120,6 @@ IMPLICIT NONE
 ! INPUT VARIABLES
 INTEGER,INTENT(IN) :: nTotal         ! total number of points
 REAL, INTENT(IN)   :: x_in(3,nTotal) ! input coordinates represent a cylinder: 
-INTEGER, INTENT(IN):: InputCoordSys  ! =0: x_in(1:3) are (x,y,z) coordinates in a cylinder of size r=[0;1], z=[0;1]
-                                     ! =1: x_in(1:3) are (r,z,phi) coordinates r= [0;1], z= [0;1], phi=[0;1]
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
 REAL,INTENT(OUT)   :: x_out(3,nTotal) ! mapped x,y,z coordinates with vmec data

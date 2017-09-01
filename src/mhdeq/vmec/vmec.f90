@@ -100,6 +100,7 @@ REAL,ALLOCATABLE     :: lmns_half(:,:)
   ! debug output (files/messages) (default: .FALSE.)
   debug = .FALSE.
 
+  useSFL=GETLOGICAL("VMEC_useSFL",".FALSE.")
  
   !! read VMEC 2000 output (netcdf)
   CALL ReadVmecOutput(VMECdataFile)
@@ -198,6 +199,7 @@ REAL,ALLOCATABLE     :: lmns_half(:,:)
   !ALLOCATE(iota_spl(4,1:nFluxVMEC))
   !iota_spl(1,:)=iotaf(:)
   !CALL SPLINE1_FIT(nFluxVMEC,rho,iota_Spl(:,:), K_BC1=3, K_BCN=0)
+  WRITE(*,*)'   iota axis/middle/edge',iotaf(1),iotaf(nFluxVMEC/2),iotaf(nFluxVMEC)
 
 
   WRITE(UNIT_stdOut,'(A)')'  ... DONE'
@@ -332,6 +334,7 @@ USE MOD_VMEC_Vars
 USE MOD_VMEC_Mappings, ONLY: mn_mode,xm,xn
 USE MOD_VMEC_Mappings, ONLY: nFluxVMEC
 USE MOD_VMEC_Mappings, ONLY: mu0
+USE MOD_Newton,        ONLY: NewtonRoot1D_FdF
 USE SPLINE1_MOD, ONLY: SPLINE1_EVAL
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
@@ -378,11 +381,13 @@ REAL    :: Bcart(3)                !magnetic field components in (X,Y,Z) system
                                    ! Bx=Br*cos(phi) - Bphi*sin(phi)
                                    ! By=Br*sin(phi) + Bphi*cos(phi)
                                    ! Bz=Bz
-REAL    :: Arho,Atheta,Azeta       !covariant components of the magnetic vector potential
 REAL    :: Ar,Az,Aphi,Acart(3)     ! R,Z,phi and cartesian components of the magnetic vector potential
 REAL    :: Density,Pressure        !from density and pressure profiles
 REAL    :: coszeta,sinzeta         !cos(zeta),sin(zeta)
 REAL    :: R,Z                     !
+REAL    :: theta_star              ! for SFL
+REAL    :: lam_rho(mn_mode)        ! for SFL
+REAL    :: dldtheta_rho(mn_mode)   ! for SFL
 !===================================================================================================================================
 WRITE(UNIT_stdOut,'(A,I8,A,A,A)')'  MAP ', nTotal,' NODES TO VMEC DATA FROM ',TRIM(VMECdataFile),' ...'
 percent=0
@@ -400,18 +405,48 @@ DO iNode=1,nTotal
   CASE(1) !x_in(1:3) = (r,z,phi) with r= [0;1], z= [0;1], phi=[0;1] 
     r_p =  x_in(1,iNode) !=r
     theta = 2.*Pi*x_in(3,iNode) !=2*pi*phi
-    zeta  = -2.*Pi*x_in(2,iNode) !=2*pi*z
+    zeta  = 2.*Pi*x_in(2,iNode) !=2*pi*z
   END SELECT 
+
+  !psinorm ~ r_p**2 , use scaling of radius to psi toroidal flux evaluation variable
+  !rho_p = SQRT(psinorm)=r_p
+
+  rho_p=MIN(1.,MAX(r_p,1.0E-4)) ! ~ psinorm [1.0-e08,1.]
   
+  IF(useSFL)THEN !straight-field line coordinates: theta is actually theta^*, find corresponding theta from 
+              !-theta^*+theta+lambda(s,theta,zeta) != 0
+    theta_star=theta
+    !prepare evaluation of all modes of lambda at position rho
+    DO iMode=1,mn_mode
+      SELECT CASE(xmabs(iMode))
+      CASE(0)
+        rhom=1.
+        drhom=0.
+      CASE(1)
+        rhom=rho_p
+        drhom=1.
+      CASE(2)
+        rhom=rho_p*rho_p
+        drhom=2*rho_p
+      CASE DEFAULT
+        rhom=rho_p**xmabs(iMode)
+        drhom=xmabs(iMode)*rho_p**(xmabs(iMode)-1)
+      END SELECT
+      !lambda
+      CALL SPLINE1_EVAL((/1,1,0/), nFluxVMEC,rho_p,rho,lmns_Spl(:,:,iMode),iGuess,splout) 
+      lam_rho(     iMode)= rhom*splout(1)
+      dldtheta_rho(iMode)= rhom*splout(1)*xm(iMode) 
+    END DO !iMode
+
+    
+    theta=NewtonRoot1D_FdF(1.0e-12,theta_star-Pi,theta_star+Pi,theta_star,theta_star,FRdFR)
+
+  END IF
   CosMN(:)      = COS(    xm(:) * theta -     xn(:) * zeta)
   SinMN(:)      = SIN(    xm(:) * theta -     xn(:) * zeta) 
     !not needed anymore (only for gmnc)
   !CosMN_nyq(:)  = COS(xm_nyq(:) * theta - xn_nyq(:) * zeta)
   
-  !psinorm ~ r_p**2 , use scaling of radius to psi toroidal flux evaluation variable
-  !rho_p = SQRT(psinorm)=r_p
-
-  rho_p=MIN(1.,MAX(r_p,1.0E-4)) ! ~ psinorm [1.0-e08,1.]
   
   R         =0.
   Z         =0.
@@ -620,6 +655,26 @@ DO iNode=1,nTotal
 END DO !iNode=1,nTotal
 
 WRITE(UNIT_stdOut,'(A)')'  ...DONE.                             '
+
+!for iteration on theta^*
+CONTAINS 
+
+  FUNCTION FRdFR(theta_iter)
+    IMPLICIT NONE
+    REAL:: theta_iter
+    REAL:: FRdFR(2)
+    CosMN(:)      = COS(    xm(:) * theta_iter -     xn(:) * zeta)
+    SinMN(:)      = SIN(    xm(:) * theta_iter -     xn(:) * zeta) 
+    lam       =0.
+    dldtheta   =0.
+    DO iMode=1,mn_mode
+      lam      = lam      + lam_rho(iMode)*SinMN(iMode)
+      dldtheta = dldtheta + dldtheta_rho(iMode)*CosMN(iMode)
+    END DO !iMode=1,mn_mode 
+    FRdFR(1)=theta_iter+lam
+    FRdFR(2)=1.0+dldtheta
+  END FUNCTION FRdFR
+
 END SUBROUTINE MapToVmec 
 
 

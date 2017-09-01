@@ -131,7 +131,7 @@ CALL PostDeformFunc(nTotal,xElem,xElem)
 
 IF(whichEquilibrium.GT.0)THEN
   ALLOCATE(MHDEQdataEq(nVarMHDEQ,0:N,0:N,0:N,nMeshElems))
-  CALL MapToMHDEQ(nTotal,xElem,0,xElem,MHDEQdataEq)
+  CALL MapToMHDEQ(nTotal,xElem,xElem,MHDEQdataEq)
 
   ALLOCATE(MHDEQoutdataGL(nVarMHDEQ,0:N,0:N,0:N,nMeshElems))
   IF(PostDeform_useGL.AND.(N.GT.2))THEN
@@ -707,6 +707,8 @@ CASE(34) ! cos3D (1.5Pi) [-1;1]^3
   x_out(1,:) = x_in(1,:)+ 0.1*COS(1.5*Pi*x_in(1,:))*COS(1.5*Pi*x_in(2,:))*COS(1.5*Pi*x_in(3,:))
   x_out(2,:) = x_in(2,:)+ 0.1*COS(1.5*Pi*x_in(1,:))*COS(1.5*Pi*x_in(2,:))*COS(1.5*Pi*x_in(3,:))
   x_out(3,:) = x_in(3,:)+ 0.1*COS(1.5*Pi*x_in(1,:))*COS(1.5*Pi*x_in(2,:))*COS(1.5*Pi*x_in(3,:))
+CASE(1000) !do nothing
+  x_out(:,:)=x_in(:,:)
 END SELECT
 
 END SUBROUTINE PostDeformFunc

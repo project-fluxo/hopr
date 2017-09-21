@@ -76,9 +76,10 @@ TYPE(tElem),POINTER            :: Elem  ! ?
 TYPE(tSide),POINTER            :: Side  ! ?
 INTEGER                        :: ElemID,SideID,NodeID  ! ?
 INTEGER                        :: locnSides
-INTEGER                        :: iNode,i,iMortar
+INTEGER                        :: iNode,i,iMortar,ne
 LOGICAL                        :: found
 CHARACTER(LEN=26)              :: ElemTypeName(1:11)
+CHARACTER(LEN=40)              :: fmtstr
 !===================================================================================================================================
 WRITE(UNIT_stdOut,'(132("~"))')
 CALL Timer(.TRUE.)
@@ -349,6 +350,23 @@ IF(ElemCounter(2,i).GT.0) &
 END DO !i=1,11
 WRITE(*,'(A40)')   &
         '    ____________________________________'
+
+!compute prime factors of nElems:
+i=2
+ne=nElems
+WRITE(*,*)
+WRITE(*,'(A,I8,A)') 'Prime factors of nElems= ',nElems,' :'
+WRITE(*,'(A10)',ADVANCE='NO') '   ==>   1'
+DO WHILE (i.LE.nE)
+  DO WHILE (MOD(nE,i) .EQ.0)
+    nE=nE/i
+    WRITE(fmtstr,'(A5,I2,A1)')'(A2,I',FLOOR(log(REAL(i))/log(REAL(10)))+2,')'
+    WRITE(*,fmtstr,ADVANCE='NO') ', ',i
+  END DO
+  i=i+1 
+END DO
+WRITE(*,*)
+WRITE(*,*)
 
 IF(dosortIJK)THEN
   ! WRITE element ijk index (for postprocessing of structured/semistructured domains)

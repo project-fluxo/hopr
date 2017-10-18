@@ -360,8 +360,8 @@ WRITE(*,'(A10)',ADVANCE='NO') '   ==>   1'
 DO WHILE (i.LE.nE)
   DO WHILE (MOD(nE,i) .EQ.0)
     nE=nE/i
-    WRITE(fmtstr,'(A5,I2,A1)')'(A2,I',FLOOR(log(REAL(i))/log(REAL(10)))+2,')'
-    WRITE(*,fmtstr,ADVANCE='NO') ', ',i
+    WRITE(fmtstr,'(A5,I2,A1)')'(A5,I',FLOOR(log(REAL(i))/log(REAL(10)))+1,')'
+    WRITE(*,fmtstr,ADVANCE='NO') '  x  ',i
   END DO
   i=i+1 
 END DO

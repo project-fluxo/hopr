@@ -140,10 +140,13 @@ CONTAINS
   SUBROUTINE ReadVmec(fileName)
 
     INCLUDE "netcdf.inc"
-
+  !=====================================================================
+  ! INPUT/OUTPUT VARIABLES
     CHARACTER(LEN = *), INTENT(IN) :: fileName
-
+  !---------------------------------------------------------------------
+  ! LOCAL VARIABLES
     INTEGER :: aStat, aError, ioError, ncid, id
+  !=====================================================================
 
     WRITE(*,*)'VMEC READ WOUT FILE...'
     !! open NetCDF input file
@@ -354,5 +357,54 @@ CONTAINS
     WRITE(*,*)'...DONE.'
 
   END SUBROUTINE ReadVmec
+
+! ----------------------------------------------------------------------
+!> recompute lambda at the full flux surfaces via an elliptic solution on 
+!> each flux surface
+! ----------------------------------------------------------------------
+
+  SUBROUTINE RecomputeLambda()
+  !=====================================================================
+  ! INPUT/OUTPUT VARIABLES
+  USE MOD_Basis1D,ONLY:SOLVE
+  !---------------------------------------------------------------------
+  ! LOCAL VARIABLES
+    INTEGER          :: iFlux,iMode,jMode,i_m,i_n,np_m,np_n,nyq
+    REAL(KIND = wp),ALLOCATABLE  :: cosMN(:,:,:),sinMN(:,:,:)
+    REAL(KIND = wp),ALLOCATABLE  :: J(:,:),g_tt(:,:),g_tz(:,:),g_zz(:,:)
+    REAL(KIND = wp)              :: Amat(mn_mode,mn_mode)
+    REAL(KIND = wp)              :: RHS(mn_mode)
+    REAL(KIND = wp)              :: lambda(mn_mode)
+  !=====================================================================
+  nyq=4
+  np_m=1+nyq*MAXVAL(ABS(xm)) !m_points [0,2pi]
+  np_n=1+nyq*MAXVAL(ABS(xn))/nfp !n_points [0,2pi/nfs] ->  *nfp in integration
+
+  ALLOCATE(cosMN(mn_mode,0:np_m,0:np_n))
+  ALLOCATE(sinMN(mn_mode,0:np_m,0:np_n))
+  ALLOCATE(g_tt(0:np_m,0:np_n))
+  ALLOCATE(g_tz(0:np_m,0:np_n))
+  ALLOCATE(   J(0:np_m,0:np_n))
+  DO i_m=0,np_m; DO i_n=0,np_n
+    cosMN(:,i_m,i_n)=COS(twoPi*(xm(:)*REAL(i_m,wp)/REAL(np_m+1,wp)-xn(:)*REAL(i_n,wp)/REAL(nfp*(np_n+1),wp)))
+    sinMN(:,i_m,i_n)=SIN(twoPi*(xm(:)*REAL(i_m,wp)/REAL(np_m+1,wp)-xn(:)*REAL(i_n,wp)/REAL(nfp*(np_n+1),wp)))
+  END DO; END DO !i_m,i_n
+
+  DO iFlux=2,nFluxVMEC
+    lambda=lmns(iFlux,:)
+    DO jMode=1,mn_mode; DO iMode=1,mn_mode
+      Amat(iMode,jMode) =SUM(( ( g_tt(:,:)*(-xn(iMode))                  &  ! 1/J g_theta,theta dlambda_dzeta dsigma_dtheta
+                                -g_tz(:,:)*( xm(iMode))*( xm(jMode)))    &  !-1/J g_theta,zeta dlambda_dtheta dsigma_dtheta
+                              +( g_tz(:,:)*(-xn(iMode))                  &  !+1/J g_zeta,theta dlambda_dzeta dsigma_dzeta
+                                -g_zz(:,:)*( xm(iMode))*(-xn(jMode))))   &  !-1/J g_zeta,zeta  dlambda_dtheta dsigma_dzeta
+                             *(cosMN(iMode,:,:)**2) )
+      RHS (jMode)        =SUM(( ( iotaf(iFlux)*g_tt(:,:)*(-xn(iMode))       &            ! 1/J g_theta,theta dlambda_dzeta dsigma_dtheta
+                                )))!....
+    END DO; END DO !iMode,jMode
+    
+    lmns(iFlux,:)=SOLVE(Amat,RHS)  
+  END DO
+  DEALLOCATE(cosMN,sinMN)
+  END SUBROUTINE RecomputeLambda
 
 END MODULE MOD_VMEC_Readin

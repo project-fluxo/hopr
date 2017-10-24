@@ -58,7 +58,7 @@ USE MOD_Globals,ONLY:UNIT_stdOut,abort
 USE MOD_ReadInTools
 USE MOD_VMEC_Vars
 USE SPLINE1_MOD,       ONLY:SPLINE1_FIT 
-USE MOD_VMEC_Mappings ! for ReadVMECoutput,VMEC variables
+USE MOD_VMEC_Readin   ! for ReadVMEC,VMEC variables
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -74,34 +74,14 @@ LOGICAL              :: useFilter
 !===================================================================================================================================
   WRITE(UNIT_stdOut,'(A)')'  INIT VMEC INPUT ...'
 
-  me_rank = 0
-  me_size = 1
   !VMEC "wout*.nc"  file
   VMECdataFile=GETSTR("VMECwoutfile")
-  ! use internal remapping of VMEC output 
-  corVMEC =GETLOGICAL("corVMEC",".FALSE.") 
-  ! grid for evaluation of fourier modes (default: 4,4) , should be set to (128, 128) if smoothing is needed
-  intPointsU=GETINT("VMEC_intPointsU","4") 
-  intPointsV=GETINT("VMEC_intPointsV","4")
-  ! use scaled |B|*sqrtG instead of |B| (default: .FALSE.)
-  useScaledB=GETLOGICAL("VMEC_useScaledB",".FALSE.")
-  ! use last value for extrapolation or linear extrapolation (default: .FALSE.)
-  useLastVal=GETLOGICAL("VMEC_useLastVal",".FALSE.")
-  ! use error bars for R, z smoothing (default: .TRUE.)
-  useVar =GETLOGICAL("VMEC_useVar", ".TRUE.")
-  ! smoothing weight for R, z smoothing (default: 1.D-3)
-  weight =GETREAL("VMEC_weight","1.0-3")
-  ! error intervals (default: 1.D-1, 9.5D-1)
-  errInt= GETREALARRAY("VMEC_errInt",2,"1.0-1, 9.5-1")
-  ! error bars for intervals (default: 1.D-1, 1.D-3, 1.D-2)
-  errVal=GETREALARRAY("VMEC_errVal",3,"1.0-1,1.0-3,1.0-2")
-  ! debug output (files/messages) (default: .FALSE.)
-  debug = .FALSE.
 
+  !use StraightFieldline mapping 
   useSFL=GETLOGICAL("VMEC_useSFL",".FALSE.")
  
   !! read VMEC 2000 output (netcdf)
-  CALL ReadVmecOutput(VMECdataFile)
+  CALL ReadVmec(VMECdataFile)
 
 
   !gmnc not needed anymore
@@ -125,8 +105,8 @@ LOGICAL              :: useFilter
 
   WRITE(UNIT_stdOut,*)'   Total Number of mn-modes:',mn_mode
   WRITE(UNIT_stdOut,*)'   Max Mode m,n: ',MAXVAL(xm),MAXVAL(xn)
-  WRITE(UNIT_stdOut,*)'   Total Number of mn-modes (Nyquist):',mn_mode_nyq
-  WRITE(UNIT_stdOut,*)'   Max Mode m,n: ',MAXVAL(xm_nyq),MAXVAL(xn_nyq)
+!  WRITE(UNIT_stdOut,*)'   Total Number of mn-modes (Nyquist):',mn_mode_nyq
+!  WRITE(UNIT_stdOut,*)'   Max Mode m,n: ',MAXVAL(xm_nyq),MAXVAL(xn_nyq)
 
   useFilter=.TRUE. !GETLOGICAL('VMECuseFilter','.TRUE.') !SHOULD BE ALWAYS TRUE...
 
@@ -143,21 +123,6 @@ LOGICAL              :: useFilter
       END IF
     END IF !usefilter
   END DO !iMode=1,mn_mode
-
-  !xmabs_nyq not needed anymore (only for gmnc)...
-  !ALLOCATE(xmabs_nyq(mn_mode_nyq))
-  !DO iMode=1,mn_mode_nyq
-  !  xmabs_nyq(iMode)=ABS(NINT(xm_nyq(iMode)))
-  !  IF(useFilter)THEN
-  !    IF(xmabs_nyq(iMode) > 3) THEN !Filtering for |m| > 3
-  !      IF(MOD(xmabs_nyq(iMode),2) == 0) THEN
-  !        xmabs_nyq(iMode)=2 !Even mode, remove rho**2
-  !      ELSE
-  !        xmabs_nyq(iMode)=3 !Odd mode, remove rho**3
-  !      END IF
-  !    END IF
-  !  END IF !usefilter
-  !END DO !iMode=1,mn_mode
 
   !prepare Spline interpolation
   ALLOCATE(rho(1:nFluxVMEC))
@@ -197,17 +162,6 @@ LOGICAL              :: useFilter
   chi_spl(1,:)=chi_Prof(:)
   CALL SPLINE1_FIT(nFluxVMEC,rho,chi_Spl(:,:), K_BC1=3, K_BCN=0)
 
-  !not needed anymore
-  !ALLOCATE(gmnc_nyq_Spl(4,1:nFluxVMEC,mn_mode_nyq))
-  !CALL FitSplineHalf(mn_mode_nyq,xmAbs_nyq,gmnc_half_nyq,gmnc_nyq_Spl)
-  !
-  !ALLOCATE(dPhi_ds_spl(4,1:nFluxVMEC))
-  !dPhi_ds_spl(1,:)=phipf(:)
-  !CALL SPLINE1_FIT(nFluxVMEC,rho,dPhi_ds_Spl(:,:), K_BC1=3, K_BCN=0)
-  !
-  !ALLOCATE(iota_spl(4,1:nFluxVMEC))
-  !iota_spl(1,:)=iotaf(:)
-  !CALL SPLINE1_FIT(nFluxVMEC,rho,iota_Spl(:,:), K_BC1=3, K_BCN=0)
   WRITE(*,*)'   iota axis/middle/edge',iotaf(1),iotaf(nFluxVMEC/2),iotaf(nFluxVMEC)
 
   WRITE(UNIT_stdOut,'(A)')'  ... DONE'
@@ -220,7 +174,7 @@ SUBROUTINE FitSpline(modes,mAbs,Xmn,Xmn_Spl)
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
-USE MOD_VMEC_Mappings, ONLY: nFluxVMEC
+USE MOD_VMEC_Readin  , ONLY: nFluxVMEC
 USE MOD_VMEC_Vars,     ONLY: rho 
 USE SPLINE1_MOD,       ONLY:SPLINE1_FIT 
 ! IMPLICIT VARIABLE HANDLING
@@ -268,7 +222,7 @@ SUBROUTINE FitSplineHalf(modes,mabs,Xmn_half,Xmn_Spl)
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
-USE MOD_VMEC_Mappings, ONLY: nFluxVMEC
+USE MOD_VMEC_Readin  , ONLY: nFluxVMEC
 USE MOD_VMEC_Vars,     ONLY: rho,Phinorm_prof
 USE SPLINE1_MOD,       ONLY:SPLINE1_FIT 
 USE SPLINE1_MOD,       ONLY:SPLINE1_INTERP 
@@ -339,9 +293,9 @@ USE MOD_MHDEQ_Vars,    ONLY: nVarMHDEQ
 USE MOD_MHDEQ_Vars,    ONLY: nRhoCoefs,RhoFluxVar,RhoCoefs
 USE MOD_MHDEQ_Tools,   ONLY: Eval1DPoly
 USE MOD_VMEC_Vars
-USE MOD_VMEC_Mappings, ONLY: mn_mode,xm,xn
-USE MOD_VMEC_Mappings, ONLY: nFluxVMEC
-USE MOD_VMEC_Mappings, ONLY: lasym,mu0
+USE MOD_VMEC_Readin  , ONLY: mn_mode,xm,xn
+USE MOD_VMEC_Readin  , ONLY: nFluxVMEC
+USE MOD_VMEC_Readin  , ONLY: lasym,mu0
 USE MOD_Newton,        ONLY: NewtonRoot1D_FdF
 USE SPLINE1_MOD, ONLY: SPLINE1_EVAL
 ! IMPLICIT VARIABLE HANDLING

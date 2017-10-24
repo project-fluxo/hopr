@@ -93,6 +93,9 @@ MODULE MOD_VMEC_Mappings
 !> number of field periods
   INTEGER :: nfp
 
+!> if lasym=0, solution is (rmnc,zmns,lmns), if lasym=1 solution is (rmnc,rmns,zmnc,zmns,lmnc,lmns)
+  LOGICAL :: lasym=.FALSE.
+
 !> dimension of s
   INTEGER :: nS
 
@@ -156,11 +159,14 @@ MODULE MOD_VMEC_Mappings
 
 !> R (cosine components on full mesh)
   REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: rmnc
+  REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: rmns
 
 !> z (sine components on full mesh)
+  REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: zmnc
   REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: zmns
 
 !> lambda (sine components (read on half mesh, interpolated on full mesh))
+  REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: lmnc
   REAL(KIND = hp), DIMENSION(:, :), ALLOCATABLE :: lmns
 
 !> kappa
@@ -495,6 +501,11 @@ CONTAINS
     !! get mnmax_nyq
     ioError = ioError + NF_INQ_VARID(ncid, "mnmax_nyq", id)
     ioError = ioError + NF_GET_VAR_INT(ncid, id, mnmax_nyq)
+    !! get iasym
+    ioError = ioError + NF_INQ_VARID(ncid, "lasym__logical__", id)
+    IF (ioError /= 0)  STOP 'problem finding varid lasym'
+    ioError = ioError + NF_GET_VAR_INT(ncid, id, lasym)
+    IF (ioError /= 0)  STOP 'problem reading lasym'
     !! get B_0
     ioError = ioError + NF_INQ_VARID(ncid, "b0", id)
     ioError = ioError + NF_GET_VAR_DOUBLE(ncid, id, b0)
@@ -556,6 +567,18 @@ CONTAINS
     aError = aError + aStat
     ALLOCATE(lmns(mn_mode, stInd:radius), stat = aStat)
     aError = aError + aStat
+    IF(lasym)THEN
+      ALLOCATE(rmns(mn_mode, stInd:radius), stat = aStat)
+      rmns=0.
+      aError = aError + aStat
+      ALLOCATE(zmnc(mn_mode, stInd:radius), stat = aStat)
+      zmnc=0.
+      aError = aError + aStat
+      aError = aError + aStat
+      ALLOCATE(lmnc(mn_mode, stInd:radius), stat = aStat)
+      lmnc=0.
+      aError = aError + aStat
+    END IF
 !    ALLOCATE(kmns(mn_mode, radius), stat = aStat)
 !    aError = aError + aStat
     ALLOCATE(gmnc(mn_mode_nyq, stInd:radius), stat = aStat)
@@ -619,7 +642,7 @@ CONTAINS
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1 /),&
          (/ nFluxVMEC /), chi(:))
     !! scale poloidal flux to get internal VMEC chi
-    chi(:nFluxVMEC) = REAL(signgs, hp) * chi(:nFluxVMEC) / TwoPi
+    chi(:nFluxVMEC) = chi(:nFluxVMEC) / TwoPi
     !! read phipf
     ioError = NF_INQ_VARID(ncid, "phipf", id)
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1 /),&
@@ -646,6 +669,19 @@ CONTAINS
     ioError = NF_INQ_VARID(ncid, "lmns", id)
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1, 1 /), (/ mn_mode,&
          nFluxVMEC /), lmns(:, 1:))
+    IF(lasym)THEN
+      ioError = NF_INQ_VARID(ncid, "rmns", id)
+      ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1, 1 /), (/ mn_mode,&
+           nFluxVMEC /), rmns(:, 1:))
+      !! read Z_mn
+      ioError = NF_INQ_VARID(ncid, "zmnc", id)
+      ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1, 1 /), (/ mn_mode,&
+           nFluxVMEC /), zmnc(:, 1:))
+      !! read lambda_mn on HALF MESH
+      ioError = NF_INQ_VARID(ncid, "lmnc", id)
+      ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1, 1 /), (/ mn_mode,&
+           nFluxVMEC /), lmnc(:, 1:))
+    END IF
     !! read jacobian_mn on HALF MESH!!
     ioError = NF_INQ_VARID(ncid, "gmnc", id)
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1, 1 /), (/&

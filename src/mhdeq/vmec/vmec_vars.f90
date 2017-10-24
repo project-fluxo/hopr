@@ -34,22 +34,25 @@ LOGICAL             :: useVMEC
 LOGICAL             :: useSFL                    !use straight-field line coordinates
 CHARACTER(LEN = 256):: VMECdataFile
 INTEGER,ALLOCATABLE :: xmAbs(:)                  ! abs |xm(iMode)|
-REAL,ALLOCATABLE    :: Psi_prof(:)               ! TOROIDAL flux profile (called phi_pf in VMEC)
-REAL,ALLOCATABLE    :: Psinorm_prof(:)           ! normalized TOROIDAL flux profile 
+REAL,ALLOCATABLE    :: Phi_prof(:)               ! TOROIDAL flux profile (called phi_pf in VMEC)
+REAL,ALLOCATABLE    :: Phinorm_prof(:)           ! normalized TOROIDAL flux profile 
 REAL,ALLOCATABLE    :: chi_prof(:)               ! POLOIDAL flux profile ( called chi_pf in VMEC)
 
-REAL,ALLOCATABLE    :: rho(:)                    ! := sqrt(psinorm) at all flux surface 
+REAL,ALLOCATABLE    :: rho(:)                    ! := sqrt(phinorm) at all flux surface 
 REAL,ALLOCATABLE    :: pres_Spl(:,:)             ! Spline coefficients in (rho) for Pressure, iota 
-REAL,ALLOCATABLE    :: Psi_Spl(:,:)       
+REAL,ALLOCATABLE    :: Phi_Spl(:,:)       
 REAL,ALLOCATABLE    :: chi_Spl(:,:)       
 REAL,ALLOCATABLE    :: Rmnc_Spl(:,:,:)           ! modified spline coefficients of Rmnc
-REAL,ALLOCATABLE    :: Zmns_Spl(:,:,:)           !
+REAL,ALLOCATABLE    :: Rmns_Spl(:,:,:)           ! modified spline coefficients of Rmns
+REAL,ALLOCATABLE    :: lmnc_Spl(:,:,:)           !
 REAL,ALLOCATABLE    :: lmns_Spl(:,:,:)           !
+REAL,ALLOCATABLE    :: Zmnc_Spl(:,:,:)           !
+REAL,ALLOCATABLE    :: Zmns_Spl(:,:,:)           !
 !not used anymore
 !INTEGER,ALLOCATABLE :: xmAbs_nyq(:)              ! abs |xm(iMode)|
 !REAL,ALLOCATABLE    :: gmnc_nyq_Spl(:,:,:)       !
 !REAL,ALLOCATABLE    :: iota_Spl(:,:)       
-!REAL,ALLOCATABLE    :: dPsi_ds_Spl(:,:)          ! two modes in vmec: if toroidal flux is used for profiles, 
+!REAL,ALLOCATABLE    :: dPhi_ds_Spl(:,:)          ! two modes in vmec: if toroidal flux is used for profiles, 
 !                                                 ! then s=Psinorm [0,1], Psi(s)=Psi(1)+(Psi(n)-Psi(1))*s,dPsi/ds=Psi(n)-Psi(1). 
 !                                                 ! VMEC can also use the normalized polodial fluxes for s (RFP=.TRUE. option),
 !                                                 ! then dPsi/ds = dPsi/dchinorm = (chi(n)-chi(1))/iota

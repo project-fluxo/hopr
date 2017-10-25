@@ -71,7 +71,7 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
 INTEGER              :: iMode,nyq,np_m,np_n
-LOGICAL              :: useFilter
+LOGICAL              :: useFilter,reLambda
 !===================================================================================================================================
   WRITE(UNIT_stdOut,'(A)')'  INIT VMEC INPUT ...'
 
@@ -81,7 +81,6 @@ LOGICAL              :: useFilter
   !use StraightFieldline mapping 
   useSFL=GETLOGICAL("VMEC_useSFL",".FALSE.")
  
-  nyq=GETINT("VMEC_Lam_nyq","8")
   !! read VMEC 2000 output (netcdf)
   CALL ReadVmec(VMECdataFile)
 
@@ -106,7 +105,7 @@ LOGICAL              :: useFilter
   WRITE(UNIT_stdOut,'(4X,A,3F10.4)')'min/max poloidal flux',MINVAL(chi),MAXVAL(chi)
 
   WRITE(UNIT_stdOut,'(4X,A, I6)')'Total Number of mn-modes:',mn_mode
-  WRITE(UNIT_stdOut,'(4X,A,2I6)')'Max Mode m,n: ',NINT(MAXVAL(xm)),NINT(MAXVAL(xn))
+  WRITE(UNIT_stdOut,'(4X,A,3I6)')'Max Mode m,n,nfp: ',NINT(MAXVAL(xm)),NINT(MAXVAL(xn)),nfp
 !  WRITE(UNIT_stdOut,*)'   Total Number of mn-modes (Nyquist):',mn_mode_nyq
 !  WRITE(UNIT_stdOut,*)'   Max Mode m,n: ',MAXVAL(xm_nyq),MAXVAL(xn_nyq)
 
@@ -147,17 +146,22 @@ LOGICAL              :: useFilter
     
   END IF
 
-  np_m=1+nyq*2*(NINT(MAXVAL(ABS(xm)))/2) !m_points [0,2pi]
-  np_n=1+nyq*2*(NINT(MAXVAL(ABS(xn)))/(2*nfp)) !n_points [0,2pi/nfs] ->  
-  CALL RecomputeLambda(np_m,np_n) !recomputes lambda on FULL MESH
+  relambda=GETLOGICAL("VMEC_relambda",".TRUE.")
+  IF(relambda) nyq=GETINT("VMEC_Lam_nyq","4")
 
   ALLOCATE(lmns_Spl(4,1:nFluxVMEC,mn_mode))
-!  CALL FitSplineHalf(mn_mode,nFluxVMEC,xmAbs,lmns,lmns_Spl)
-  CALL FitSpline(mn_mode,nFluxVMEC,xmAbs,lmns,lmns_Spl)
-  IF(lasym)THEN
-    ALLOCATE(lmnc_Spl(4,1:nFluxVMEC,mn_mode))
-!    CALL FitSplineHalf(mn_mode,nFluxVMEC,xmAbs,lmnc,lmnc_Spl)
-    CALL FitSpline(mn_mode,nFluxVMEC,xmAbs,lmnc,lmnc_Spl)
+  IF(lasym) ALLOCATE(lmnc_Spl(4,1:nFluxVMEC,mn_mode))
+  IF(reLambda)THEN
+    np_m=1+nyq*2*(NINT(MAXVAL(ABS(xm)))/2) !m_points [0,2pi]
+    np_n=1+nyq*2*(NINT(MAXVAL(ABS(xn)))/(2*nfp)) !n_points [0,2pi/nfs] ->  
+    !recompute lambda on FULL GRID
+    CALL RecomputeLambda(np_m,np_n) 
+    CALL           FitSpline(mn_mode,nFluxVMEC,xmAbs,lmns,lmns_Spl)
+    IF(lasym) CALL FitSpline(mn_mode,nFluxVMEC,xmAbs,lmnc,lmnc_Spl)
+  ELSE
+    !lambda given on half grid
+    CALL           FitSplineHalf(mn_mode,nFluxVMEC,xmAbs,lmns,lmns_Spl)
+    IF(lasym) CALL FitSplineHalf(mn_mode,nFluxVMEC,xmAbs,lmnc,lmnc_Spl)
   END IF
 
   ALLOCATE(pres_spl(4,1:nFluxVMEC))

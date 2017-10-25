@@ -2049,31 +2049,31 @@
         <Domain name="range" id="4175.NumberOfTableValues.range"/>
       </Property>
       <Property name="RGBPoints" id="4175.RGBPoints" number_of_elements="28">
-        <Element index="0" value="0.00162952885708686"/>
+        <Element index="0" value="0.0126617905623974"/>
         <Element index="1" value="1"/>
         <Element index="2" value="1"/>
         <Element index="3" value="1"/>
-        <Element index="4" value="0.208608221077883"/>
+        <Element index="4" value="2831.7200010323"/>
         <Element index="5" value="0"/>
         <Element index="6" value="0"/>
         <Element index="7" value="1"/>
-        <Element index="8" value="0.415569478175765"/>
+        <Element index="8" value="5663.18880767444"/>
         <Element index="9" value="0"/>
         <Element index="10" value="1"/>
         <Element index="11" value="1"/>
-        <Element index="12" value="0.610364533077013"/>
+        <Element index="12" value="8328.20992986529"/>
         <Element index="13" value="0"/>
         <Element index="14" value="1"/>
         <Element index="15" value="0"/>
-        <Element index="16" value="0.817325790174893"/>
+        <Element index="16" value="11159.6787365074"/>
         <Element index="17" value="1"/>
         <Element index="18" value="1"/>
         <Element index="19" value="0"/>
-        <Element index="20" value="1.02428852357446"/>
+        <Element index="20" value="13991.1677406601"/>
         <Element index="21" value="1"/>
         <Element index="22" value="0"/>
         <Element index="23" value="0"/>
-        <Element index="24" value="1.21908210217402"/>
+        <Element index="24" value="16656.1686653404"/>
         <Element index="25" value="0.878431"/>
         <Element index="26" value="0"/>
         <Element index="27" value="1"/>
@@ -2175,15 +2175,15 @@
         <Domain name="range" id="8552.NumberOfTableValues.range"/>
       </Property>
       <Property name="RGBPoints" id="8552.RGBPoints" number_of_elements="12">
-        <Element index="0" value="8.42211079790811e-05"/>
+        <Element index="0" value="6.07508518612618e-05"/>
         <Element index="1" value="0.231373"/>
         <Element index="2" value="0.298039"/>
         <Element index="3" value="0.752941"/>
-        <Element index="4" value="0.84480943161602"/>
+        <Element index="4" value="0.628733853180719"/>
         <Element index="5" value="0.865003"/>
         <Element index="6" value="0.865003"/>
         <Element index="7" value="0.865003"/>
-        <Element index="8" value="1.68953464212406"/>
+        <Element index="8" value="1.25740695550958"/>
         <Element index="9" value="0.705882"/>
         <Element index="10" value="0.0156863"/>
         <Element index="11" value="0.14902"/>
@@ -2492,7 +2492,7 @@
         <Domain name="bool" id="8568.IndexedLookup.bool"/>
       </Property>
       <Property name="LockScalarRange" id="8568.LockScalarRange" number_of_elements="1">
-        <Element index="0" value="0"/>
+        <Element index="0" value="1"/>
         <Domain name="bool" id="8568.LockScalarRange.bool"/>
       </Property>
       <Property name="NanColor" id="8568.NanColor" number_of_elements="3">
@@ -2505,15 +2505,15 @@
         <Domain name="range" id="8568.NumberOfTableValues.range"/>
       </Property>
       <Property name="RGBPoints" id="8568.RGBPoints" number_of_elements="12">
-        <Element index="0" value="6.66237731650199e-09"/>
+        <Element index="0" value="-0.397465109825134"/>
         <Element index="1" value="0.231373"/>
         <Element index="2" value="0.298039"/>
         <Element index="3" value="0.752941"/>
-        <Element index="4" value="0.333118859284405"/>
+        <Element index="4" value="7.1406364440918e-05"/>
         <Element index="5" value="0.865003"/>
         <Element index="6" value="0.865003"/>
         <Element index="7" value="0.865003"/>
-        <Element index="8" value="0.666237711906433"/>
+        <Element index="8" value="0.397607922554016"/>
         <Element index="9" value="0.705882"/>
         <Element index="10" value="0.0156863"/>
         <Element index="11" value="0.14902"/>
@@ -8187,6 +8187,116 @@
         </Domain>
       </Property>
     </Proxy>
+    <Proxy group="lookup_tables" type="PVLookupTable" id="8584" servers="21">
+      <Property name="AboveRangeColor" id="8584.AboveRangeColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+      </Property>
+      <Property name="ActiveAnnotatedValues" id="8584.ActiveAnnotatedValues"/>
+      <Property name="AllowDuplicateScalars" id="8584.AllowDuplicateScalars" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8584.AllowDuplicateScalars.bool"/>
+      </Property>
+      <Property name="Annotations" id="8584.Annotations"/>
+      <Property name="BelowRangeColor" id="8584.BelowRangeColor" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="Build" id="8584.Build"/>
+      <Property name="ColorSpace" id="8584.ColorSpace" number_of_elements="1">
+        <Element index="0" value="3"/>
+        <Domain name="enum" id="8584.ColorSpace.enum">
+          <Entry value="0" text="RGB"/>
+          <Entry value="1" text="HSV"/>
+          <Entry value="2" text="Lab"/>
+          <Entry value="3" text="Diverging"/>
+        </Domain>
+      </Property>
+      <Property name="Discretize" id="8584.Discretize" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8584.Discretize.bool"/>
+      </Property>
+      <Property name="EnableOpacityMapping" id="8584.EnableOpacityMapping" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.EnableOpacityMapping.bool"/>
+      </Property>
+      <Property name="HSVWrap" id="8584.HSVWrap" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.HSVWrap.bool"/>
+      </Property>
+      <Property name="IndexedColors" id="8584.IndexedColors"/>
+      <Property name="IndexedLookup" id="8584.IndexedLookup" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.IndexedLookup.bool"/>
+      </Property>
+      <Property name="LockScalarRange" id="8584.LockScalarRange" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.LockScalarRange.bool"/>
+      </Property>
+      <Property name="NanColor" id="8584.NanColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="NumberOfTableValues" id="8584.NumberOfTableValues" number_of_elements="1">
+        <Element index="0" value="256"/>
+        <Domain name="range" id="8584.NumberOfTableValues.range"/>
+      </Property>
+      <Property name="RGBPoints" id="8584.RGBPoints" number_of_elements="12">
+        <Element index="0" value="0.999999957401791"/>
+        <Element index="1" value="0.231373"/>
+        <Element index="2" value="0.298039"/>
+        <Element index="3" value="0.752941"/>
+        <Element index="4" value="1.00000495745158"/>
+        <Element index="5" value="0.865003"/>
+        <Element index="6" value="0.865003"/>
+        <Element index="7" value="0.865003"/>
+        <Element index="8" value="1.00000995750137"/>
+        <Element index="9" value="0.705882"/>
+        <Element index="10" value="0.0156863"/>
+        <Element index="11" value="0.14902"/>
+      </Property>
+      <Property name="RescaleOnVisibilityChange" id="8584.RescaleOnVisibilityChange" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.RescaleOnVisibilityChange.bool"/>
+      </Property>
+      <Property name="ScalarOpacityFunction" id="8584.ScalarOpacityFunction" number_of_elements="1">
+        <Proxy value="8583"/>
+      </Property>
+      <Property name="ScalarRangeInitialized" id="8584.ScalarRangeInitialized" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8584.ScalarRangeInitialized.bool"/>
+      </Property>
+      <Property name="ShowIndexedColorActiveValues" id="8584.ShowIndexedColorActiveValues" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.ShowIndexedColorActiveValues.bool"/>
+      </Property>
+      <Property name="UseAboveRangeColor" id="8584.UseAboveRangeColor" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.UseAboveRangeColor.bool"/>
+      </Property>
+      <Property name="UseBelowRangeColor" id="8584.UseBelowRangeColor" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.UseBelowRangeColor.bool"/>
+      </Property>
+      <Property name="UseLogScale" id="8584.UseLogScale" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8584.UseLogScale.bool"/>
+      </Property>
+      <Property name="VectorComponent" id="8584.VectorComponent" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="8584.VectorComponent.range"/>
+      </Property>
+      <Property name="VectorMode" id="8584.VectorMode" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="8584.VectorMode.enum">
+          <Entry value="0" text="Magnitude"/>
+          <Entry value="1" text="Component"/>
+        </Domain>
+      </Property>
+    </Proxy>
     <Proxy group="lookup_tables" type="PVLookupTable" id="4167" servers="21">
       <Property name="AboveRangeColor" id="4167.AboveRangeColor" number_of_elements="3">
         <Element index="0" value="1"/>
@@ -10241,31 +10351,31 @@
         <Domain name="range" id="4151.NumberOfTableValues.range"/>
       </Property>
       <Property name="RGBPoints" id="4151.RGBPoints" number_of_elements="28">
-        <Element index="0" value="3.23989872698643e-05"/>
+        <Element index="0" value="0.00010830973022812"/>
         <Element index="1" value="1"/>
         <Element index="2" value="1"/>
         <Element index="3" value="1"/>
-        <Element index="4" value="0.000189389005089568"/>
+        <Element index="4" value="0.000604754704211166"/>
         <Element index="5" value="0"/>
         <Element index="6" value="0"/>
         <Element index="7" value="1"/>
-        <Element index="8" value="0.00110691301938446"/>
+        <Element index="8" value="0.00337619964115689"/>
         <Element index="9" value="0"/>
         <Element index="10" value="1"/>
         <Element index="11" value="1"/>
-        <Element index="12" value="0.00583174295217366"/>
+        <Element index="12" value="0.0170362313144352"/>
         <Element index="13" value="0"/>
         <Element index="14" value="1"/>
         <Element index="15" value="0"/>
-        <Element index="16" value="0.0340845140213485"/>
+        <Element index="16" value="0.0951091701311983"/>
         <Element index="17" value="1"/>
         <Element index="18" value="1"/>
         <Element index="19" value="0"/>
-        <Element index="20" value="0.199214666475254"/>
+        <Element index="20" value="0.530978069036582"/>
         <Element index="21" value="1"/>
         <Element index="22" value="0"/>
         <Element index="23" value="0"/>
-        <Element index="24" value="1.04954416085694"/>
+        <Element index="24" value="2.67927113455454"/>
         <Element index="25" value="0.878431"/>
         <Element index="26" value="0"/>
         <Element index="27" value="1"/>
@@ -10497,27 +10607,27 @@
         <Element index="1" value="1"/>
         <Element index="2" value="1"/>
         <Element index="3" value="1"/>
-        <Element index="4" value="0.207069422225198"/>
+        <Element index="4" value="0.451771643218929"/>
         <Element index="5" value="0"/>
         <Element index="6" value="0"/>
         <Element index="7" value="1"/>
-        <Element index="8" value="0.414121008170461"/>
+        <Element index="8" value="0.903504837343846"/>
         <Element index="9" value="0"/>
         <Element index="10" value="1"/>
         <Element index="11" value="1"/>
-        <Element index="12" value="0.609001081944479"/>
+        <Element index="12" value="1.32868292905143"/>
         <Element index="13" value="0"/>
         <Element index="14" value="1"/>
         <Element index="15" value="0"/>
-        <Element index="16" value="0.816052667889739"/>
+        <Element index="16" value="1.78041612317634"/>
         <Element index="17" value="1"/>
         <Element index="18" value="1"/>
         <Element index="19" value="0"/>
-        <Element index="20" value="1.02310573078103"/>
+        <Element index="20" value="2.23215253961681"/>
         <Element index="21" value="1"/>
         <Element index="22" value="0"/>
         <Element index="23" value="0"/>
-        <Element index="24" value="1.21798432760902"/>
+        <Element index="24" value="2.65732740900885"/>
         <Element index="25" value="0.878431"/>
         <Element index="26" value="0"/>
         <Element index="27" value="1"/>
@@ -23819,11 +23929,11 @@
         <Domain name="range" id="4055.NumberOfTableValues.range"/>
       </Property>
       <Property name="RGBPoints" id="4055.RGBPoints" number_of_elements="12">
-        <Element index="0" value="-0.00876371469348669"/>
+        <Element index="0" value="0.320784986019135"/>
         <Element index="1" value="0.231373"/>
         <Element index="2" value="0.298039"/>
         <Element index="3" value="0.752941"/>
-        <Element index="4" value="0.495618142653257"/>
+        <Element index="4" value="0.660392493009567"/>
         <Element index="5" value="0.865003"/>
         <Element index="6" value="0.865003"/>
         <Element index="7" value="0.865003"/>
@@ -36961,6 +37071,187 @@
         </Domain>
       </Property>
     </Proxy>
+    <Proxy group="lookup_tables" type="PVLookupTable" id="8829" servers="21">
+      <Property name="AboveRangeColor" id="8829.AboveRangeColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+      </Property>
+      <Property name="ActiveAnnotatedValues" id="8829.ActiveAnnotatedValues" number_of_elements="8">
+        <Element index="0" value="0"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="2"/>
+        <Element index="3" value="3"/>
+        <Element index="4" value="4"/>
+        <Element index="5" value="5"/>
+        <Element index="6" value="6"/>
+        <Element index="7" value="7"/>
+      </Property>
+      <Property name="AllowDuplicateScalars" id="8829.AllowDuplicateScalars" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8829.AllowDuplicateScalars.bool"/>
+      </Property>
+      <Property name="Annotations" id="8829.Annotations" number_of_elements="24">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="1"/>
+        <Element index="3" value="1"/>
+        <Element index="4" value="2"/>
+        <Element index="5" value="2"/>
+        <Element index="6" value="3"/>
+        <Element index="7" value="3"/>
+        <Element index="8" value="4"/>
+        <Element index="9" value="4"/>
+        <Element index="10" value="5"/>
+        <Element index="11" value="5"/>
+        <Element index="12" value="6"/>
+        <Element index="13" value="6"/>
+        <Element index="14" value="7"/>
+        <Element index="15" value="7"/>
+        <Element index="16" value="8"/>
+        <Element index="17" value="8"/>
+        <Element index="18" value="9"/>
+        <Element index="19" value="9"/>
+        <Element index="20" value="10"/>
+        <Element index="21" value="10"/>
+        <Element index="22" value="11"/>
+        <Element index="23" value="11"/>
+      </Property>
+      <Property name="BelowRangeColor" id="8829.BelowRangeColor" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="Build" id="8829.Build"/>
+      <Property name="ColorSpace" id="8829.ColorSpace" number_of_elements="1">
+        <Element index="0" value="3"/>
+        <Domain name="enum" id="8829.ColorSpace.enum">
+          <Entry value="0" text="RGB"/>
+          <Entry value="1" text="HSV"/>
+          <Entry value="2" text="Lab"/>
+          <Entry value="3" text="Diverging"/>
+        </Domain>
+      </Property>
+      <Property name="Discretize" id="8829.Discretize" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8829.Discretize.bool"/>
+      </Property>
+      <Property name="EnableOpacityMapping" id="8829.EnableOpacityMapping" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.EnableOpacityMapping.bool"/>
+      </Property>
+      <Property name="HSVWrap" id="8829.HSVWrap" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.HSVWrap.bool"/>
+      </Property>
+      <Property name="IndexedColors" id="8829.IndexedColors" number_of_elements="36">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+        <Element index="3" value="1"/>
+        <Element index="4" value="0"/>
+        <Element index="5" value="0"/>
+        <Element index="6" value="0"/>
+        <Element index="7" value="1"/>
+        <Element index="8" value="0"/>
+        <Element index="9" value="0"/>
+        <Element index="10" value="0"/>
+        <Element index="11" value="1"/>
+        <Element index="12" value="1"/>
+        <Element index="13" value="1"/>
+        <Element index="14" value="0"/>
+        <Element index="15" value="1"/>
+        <Element index="16" value="0"/>
+        <Element index="17" value="1"/>
+        <Element index="18" value="0"/>
+        <Element index="19" value="1"/>
+        <Element index="20" value="1"/>
+        <Element index="21" value="0.63"/>
+        <Element index="22" value="0.63"/>
+        <Element index="23" value="1"/>
+        <Element index="24" value="0.67"/>
+        <Element index="25" value="0.5"/>
+        <Element index="26" value="0.33"/>
+        <Element index="27" value="1"/>
+        <Element index="28" value="0.5"/>
+        <Element index="29" value="0.75"/>
+        <Element index="30" value="0.53"/>
+        <Element index="31" value="0.35"/>
+        <Element index="32" value="0.7"/>
+        <Element index="33" value="1"/>
+        <Element index="34" value="0.75"/>
+        <Element index="35" value="0.5"/>
+      </Property>
+      <Property name="IndexedLookup" id="8829.IndexedLookup" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8829.IndexedLookup.bool"/>
+      </Property>
+      <Property name="LockScalarRange" id="8829.LockScalarRange" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.LockScalarRange.bool"/>
+      </Property>
+      <Property name="NanColor" id="8829.NanColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="NumberOfTableValues" id="8829.NumberOfTableValues" number_of_elements="1">
+        <Element index="0" value="256"/>
+        <Domain name="range" id="8829.NumberOfTableValues.range"/>
+      </Property>
+      <Property name="RGBPoints" id="8829.RGBPoints" number_of_elements="12">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0.231373"/>
+        <Element index="2" value="0.298039"/>
+        <Element index="3" value="0.752941"/>
+        <Element index="4" value="0.5"/>
+        <Element index="5" value="0.865003"/>
+        <Element index="6" value="0.865003"/>
+        <Element index="7" value="0.865003"/>
+        <Element index="8" value="1"/>
+        <Element index="9" value="0.705882"/>
+        <Element index="10" value="0.0156863"/>
+        <Element index="11" value="0.14902"/>
+      </Property>
+      <Property name="RescaleOnVisibilityChange" id="8829.RescaleOnVisibilityChange" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.RescaleOnVisibilityChange.bool"/>
+      </Property>
+      <Property name="ScalarOpacityFunction" id="8829.ScalarOpacityFunction" number_of_elements="1">
+        <Proxy value="8830"/>
+      </Property>
+      <Property name="ScalarRangeInitialized" id="8829.ScalarRangeInitialized" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.ScalarRangeInitialized.bool"/>
+      </Property>
+      <Property name="ShowIndexedColorActiveValues" id="8829.ShowIndexedColorActiveValues" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.ShowIndexedColorActiveValues.bool"/>
+      </Property>
+      <Property name="UseAboveRangeColor" id="8829.UseAboveRangeColor" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.UseAboveRangeColor.bool"/>
+      </Property>
+      <Property name="UseBelowRangeColor" id="8829.UseBelowRangeColor" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.UseBelowRangeColor.bool"/>
+      </Property>
+      <Property name="UseLogScale" id="8829.UseLogScale" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8829.UseLogScale.bool"/>
+      </Property>
+      <Property name="VectorComponent" id="8829.VectorComponent" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="8829.VectorComponent.range"/>
+      </Property>
+      <Property name="VectorMode" id="8829.VectorMode" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="8829.VectorMode.enum">
+          <Entry value="0" text="Magnitude"/>
+          <Entry value="1" text="Component"/>
+        </Domain>
+      </Property>
+    </Proxy>
     <Proxy group="piecewise_functions" type="PiecewiseFunction" id="4246" servers="21">
       <Property name="AllowDuplicateScalars" id="4246.AllowDuplicateScalars" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -37307,11 +37598,11 @@
         <Domain name="bool" id="4174.AllowDuplicateScalars.bool"/>
       </Property>
       <Property name="Points" id="4174.Points" number_of_elements="8">
-        <Element index="0" value="0.00162952885708686"/>
+        <Element index="0" value="0.0126617905623974"/>
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
-        <Element index="4" value="1.21908210217402"/>
+        <Element index="4" value="16656.1686653404"/>
         <Element index="5" value="1"/>
         <Element index="6" value="0.5"/>
         <Element index="7" value="0"/>
@@ -37327,11 +37618,11 @@
         <Domain name="bool" id="8551.AllowDuplicateScalars.bool"/>
       </Property>
       <Property name="Points" id="8551.Points" number_of_elements="8">
-        <Element index="0" value="8.42211079790811e-05"/>
+        <Element index="0" value="6.07508518612618e-05"/>
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
-        <Element index="4" value="1.68953464212406"/>
+        <Element index="4" value="1.25740695550958"/>
         <Element index="5" value="1"/>
         <Element index="6" value="0.5"/>
         <Element index="7" value="0"/>
@@ -37387,11 +37678,11 @@
         <Domain name="bool" id="8567.AllowDuplicateScalars.bool"/>
       </Property>
       <Property name="Points" id="8567.Points" number_of_elements="8">
-        <Element index="0" value="6.66237731650199e-09"/>
+        <Element index="0" value="-0.397465109825134"/>
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
-        <Element index="4" value="0.666237711906433"/>
+        <Element index="4" value="0.397607922554016"/>
         <Element index="5" value="1"/>
         <Element index="6" value="0.5"/>
         <Element index="7" value="0"/>
@@ -38381,6 +38672,26 @@
         <Domain name="bool" id="5120.ScalarRangeInitialized.bool"/>
       </Property>
     </Proxy>
+    <Proxy group="piecewise_functions" type="PiecewiseFunction" id="8583" servers="21">
+      <Property name="AllowDuplicateScalars" id="8583.AllowDuplicateScalars" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8583.AllowDuplicateScalars.bool"/>
+      </Property>
+      <Property name="Points" id="8583.Points" number_of_elements="8">
+        <Element index="0" value="0.999999957401791"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0.5"/>
+        <Element index="3" value="0"/>
+        <Element index="4" value="1.00000995750137"/>
+        <Element index="5" value="1"/>
+        <Element index="6" value="0.5"/>
+        <Element index="7" value="0"/>
+      </Property>
+      <Property name="ScalarRangeInitialized" id="8583.ScalarRangeInitialized" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8583.ScalarRangeInitialized.bool"/>
+      </Property>
+    </Proxy>
     <Proxy group="piecewise_functions" type="PiecewiseFunction" id="4166" servers="21">
       <Property name="AllowDuplicateScalars" id="4166.AllowDuplicateScalars" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -38747,11 +39058,11 @@
         <Domain name="bool" id="4150.AllowDuplicateScalars.bool"/>
       </Property>
       <Property name="Points" id="4150.Points" number_of_elements="8">
-        <Element index="0" value="3.23989872698643e-05"/>
+        <Element index="0" value="0.00010830973022812"/>
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
-        <Element index="4" value="1.04954416085694"/>
+        <Element index="4" value="2.67927113455455"/>
         <Element index="5" value="1"/>
         <Element index="6" value="0.5"/>
         <Element index="7" value="0"/>
@@ -38791,7 +39102,7 @@
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
-        <Element index="4" value="1.21798432760902"/>
+        <Element index="4" value="2.65732740900885"/>
         <Element index="5" value="1"/>
         <Element index="6" value="0.5"/>
         <Element index="7" value="0"/>
@@ -41207,7 +41518,7 @@
         <Domain name="bool" id="4054.AllowDuplicateScalars.bool"/>
       </Property>
       <Property name="Points" id="4054.Points" number_of_elements="8">
-        <Element index="0" value="-0.00876371469348669"/>
+        <Element index="0" value="0.320784986019135"/>
         <Element index="1" value="0"/>
         <Element index="2" value="0.5"/>
         <Element index="3" value="0"/>
@@ -43599,6 +43910,26 @@
       <Property name="ScalarRangeInitialized" id="6617.ScalarRangeInitialized" number_of_elements="1">
         <Element index="0" value="1"/>
         <Domain name="bool" id="6617.ScalarRangeInitialized.bool"/>
+      </Property>
+    </Proxy>
+    <Proxy group="piecewise_functions" type="PiecewiseFunction" id="8830" servers="21">
+      <Property name="AllowDuplicateScalars" id="8830.AllowDuplicateScalars" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8830.AllowDuplicateScalars.bool"/>
+      </Property>
+      <Property name="Points" id="8830.Points" number_of_elements="8">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0.5"/>
+        <Element index="3" value="0"/>
+        <Element index="4" value="1"/>
+        <Element index="5" value="1"/>
+        <Element index="6" value="0.5"/>
+        <Element index="7" value="0"/>
+      </Property>
+      <Property name="ScalarRangeInitialized" id="8830.ScalarRangeInitialized" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8830.ScalarRangeInitialized.bool"/>
       </Property>
     </Proxy>
     <Proxy group="misc" type="RepresentationAnimationHelper" id="6619" servers="16">
@@ -61794,7 +62125,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4413.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -61806,7 +62136,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -61881,7 +62210,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="4413.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -61893,7 +62221,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4413.ColorArrayName.field_list">
@@ -62413,7 +62740,6 @@
         <Element index="0" value="vtkOriginalPointIds"/>
         <Domain name="array_list" id="4490.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -62425,7 +62751,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -62500,7 +62825,6 @@
         <Element index="4" value="J"/>
         <Domain name="array_list" id="4490.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -62512,7 +62836,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4490.ColorArrayName.field_list">
@@ -63032,7 +63355,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4575.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -63044,7 +63366,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -63119,7 +63440,6 @@
         <Element index="4" value="J"/>
         <Domain name="array_list" id="4575.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -63131,7 +63451,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4575.ColorArrayName.field_list">
@@ -63651,7 +63970,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4724.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -63663,7 +63981,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -63738,7 +64055,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="4724.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -63750,7 +64066,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4724.ColorArrayName.field_list">
@@ -64270,7 +64585,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4801.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -64282,7 +64596,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -64357,7 +64670,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="4801.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -64369,7 +64681,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4801.ColorArrayName.field_list">
@@ -64889,7 +65200,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4878.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -64901,7 +65211,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -64976,7 +65285,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="4878.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -64988,7 +65296,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4878.ColorArrayName.field_list">
@@ -65508,7 +65815,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="4955.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -65520,7 +65826,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -65595,7 +65900,6 @@
         <Element index="4" value="eq"/>
         <Domain name="array_list" id="4955.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -65607,7 +65911,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
           <String text="cellNormals"/>
           <String text="vtkCompositeIndex"/>
@@ -65830,7 +66133,7 @@
         <Domain name="range" id="4955.NonlinearSubdivisionLevel.range"/>
       </Property>
       <Property name="Opacity" id="4955.Opacity" number_of_elements="1">
-        <Element index="0" value="1"/>
+        <Element index="0" value="0.87"/>
         <Domain name="range" id="4955.Opacity.range"/>
       </Property>
       <Property name="Orient" id="4955.Orient" number_of_elements="1">
@@ -66130,7 +66433,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="5032.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -66142,7 +66444,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -66217,7 +66518,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="5032.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -66229,7 +66529,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5032.ColorArrayName.field_list">
@@ -66749,7 +67048,6 @@
         <Element index="0" value="divB"/>
         <Domain name="array_list" id="5109.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -66761,7 +67059,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -66836,7 +67133,6 @@
         <Element index="4" value="divB"/>
         <Domain name="array_list" id="5109.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -66848,7 +67144,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5109.ColorArrayName.field_list">
@@ -67369,14 +67664,12 @@
       <Property name="SelectionPointFieldDataArrayName" id="5457.SelectionPointFieldDataArrayName" number_of_elements="1">
         <Element index="0" value="Jacobian"/>
         <Domain name="array_list" id="5457.SelectionPointFieldDataArrayName.array_list">
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
           <String text="MHDEQ-Pressure"/>
           <String text="MHDEQ-polflux"/>
           <String text="MHDEQ-torflux"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -67450,14 +67743,12 @@
         <Element index="3" value=""/>
         <Element index="4" value=""/>
         <Domain name="array_list" id="5457.ColorArrayName.array_list">
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
           <String text="MHDEQ-Pressure"/>
           <String text="MHDEQ-polflux"/>
           <String text="MHDEQ-torflux"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5457.ColorArrayName.field_list">
@@ -68007,7 +68298,6 @@
         <Element index="0" value="J"/>
         <Domain name="array_list" id="5627.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
@@ -68016,7 +68306,6 @@
           <String text="MHDEQ-torflux"/>
           <String text="divB"/>
           <String text="gradB"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -68091,7 +68380,6 @@
         <Element index="4" value=""/>
         <Domain name="array_list" id="5627.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
@@ -68100,7 +68388,6 @@
           <String text="MHDEQ-torflux"/>
           <String text="divB"/>
           <String text="gradB"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5627.ColorArrayName.field_list">
@@ -68650,7 +68937,6 @@
         <Element index="0" value="J"/>
         <Domain name="array_list" id="5797.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
@@ -68660,7 +68946,6 @@
           <String text="divB"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -68735,7 +69020,6 @@
         <Element index="4" value=""/>
         <Domain name="array_list" id="5797.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
@@ -68745,7 +69029,6 @@
           <String text="divB"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5797.ColorArrayName.field_list">
@@ -69295,7 +69578,6 @@
         <Element index="0" value="J"/>
         <Domain name="array_list" id="5967.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -69306,7 +69588,6 @@
           <String text="divB"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -69381,7 +69662,6 @@
         <Element index="4" value=""/>
         <Domain name="array_list" id="5967.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -69392,7 +69672,6 @@
           <String text="divB"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="5967.ColorArrayName.field_list">
@@ -69942,7 +70221,6 @@
         <Element index="0" value="Bvec"/>
         <Domain name="array_list" id="4336.SelectionPointFieldDataArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -69954,7 +70232,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -70029,7 +70306,6 @@
         <Element index="4" value="eq"/>
         <Domain name="array_list" id="4336.ColorArrayName.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="JxB"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
@@ -70041,7 +70317,6 @@
           <String text="eq"/>
           <String text="gradB"/>
           <String text="gradp"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="4336.ColorArrayName.field_list">
@@ -70583,14 +70858,12 @@
       <Property name="SelectionPointFieldDataArrayName" id="5287.SelectionPointFieldDataArrayName" number_of_elements="1">
         <Element index="0" value="Jacobian"/>
         <Domain name="array_list" id="5287.SelectionPointFieldDataArrayName.array_list">
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
           <String text="MHDEQ-Pressure"/>
           <String text="MHDEQ-polflux"/>
           <String text="MHDEQ-torflux"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
       </Property>
@@ -70661,8 +70934,8 @@
         <Element index="0" value=""/>
         <Element index="1" value=""/>
         <Element index="2" value=""/>
-        <Element index="3" value="0"/>
-        <Element index="4" value="MHDEQ-A"/>
+        <Element index="3" value="1"/>
+        <Element index="4" value="cellNormals"/>
         <Domain name="array_list" id="5287.ColorArrayName.array_list">
           <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
@@ -70886,7 +71159,7 @@
         <Domain name="range" id="5287.LineWidth.range"/>
       </Property>
       <Property name="LookupTable" id="5287.LookupTable" number_of_elements="1">
-        <Proxy value="8552"/>
+        <Proxy value="8584"/>
         <Domain name="groups" id="5287.LookupTable.groups"/>
       </Property>
       <Property name="MapScalars" id="5287.MapScalars" number_of_elements="1">
@@ -70952,7 +71225,7 @@
         <Domain name="range" id="5287.Position.range"/>
       </Property>
       <Property name="ScalarOpacityFunction" id="5287.ScalarOpacityFunction" number_of_elements="1">
-        <Proxy value="8551"/>
+        <Proxy value="8583"/>
         <Domain name="groups" id="5287.ScalarOpacityFunction.groups"/>
       </Property>
       <Property name="ScalarOpacityUnitDistance" id="5287.ScalarOpacityUnitDistance" number_of_elements="1">
@@ -78781,6 +79054,217 @@
         <Domain name="bool" id="8582.Visibility.bool"/>
       </Property>
     </Proxy>
+    <Proxy group="representations" type="ScalarBarWidgetRepresentation" id="8836" servers="21">
+      <Property name="Enabled" id="8836.Enabled" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.Enabled.bool"/>
+      </Property>
+      <Property name="LockPosition" id="8836.LockPosition" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.LockPosition.bool"/>
+      </Property>
+      <Property name="UseNonCompositedRenderer" id="8836.UseNonCompositedRenderer" number_of_elements="1">
+        <Element index="0" value="1"/>
+      </Property>
+      <Property name="AddRangeAnnotations" id="8836.AddRangeAnnotations" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.AddRangeAnnotations.bool"/>
+      </Property>
+      <Property name="AddRangeLabels" id="8836.AddRangeLabels" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.AddRangeLabels.bool"/>
+      </Property>
+      <Property name="AspectRatio" id="8836.AspectRatio" number_of_elements="1">
+        <Element index="0" value="20"/>
+        <Domain name="range" id="8836.AspectRatio.range"/>
+      </Property>
+      <Property name="AutoOrient" id="8836.AutoOrient" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.AutoOrient.bool"/>
+      </Property>
+      <Property name="AutoOrientInfo" id="8836.AutoOrientInfo" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.AutoOrientInfo.bool"/>
+      </Property>
+      <Property name="AutomaticAnnotations" id="8836.AutomaticAnnotations" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.AutomaticAnnotations.bool"/>
+      </Property>
+      <Property name="AutomaticLabelFormat" id="8836.AutomaticLabelFormat" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.AutomaticLabelFormat.bool"/>
+      </Property>
+      <Property name="ComponentTitle" id="8836.ComponentTitle" number_of_elements="1">
+        <Element index="0" value=""/>
+      </Property>
+      <Property name="DrawAnnotations" id="8836.DrawAnnotations" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.DrawAnnotations.bool"/>
+      </Property>
+      <Property name="DrawNanAnnotation" id="8836.DrawNanAnnotation" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.DrawNanAnnotation.bool"/>
+      </Property>
+      <Property name="DrawSubTickMarks" id="8836.DrawSubTickMarks" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.DrawSubTickMarks.bool"/>
+      </Property>
+      <Property name="DrawTickLabels" id="8836.DrawTickLabels" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.DrawTickLabels.bool"/>
+      </Property>
+      <Property name="DrawTickMarks" id="8836.DrawTickMarks" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.DrawTickMarks.bool"/>
+      </Property>
+      <Property name="LabelBold" id="8836.LabelBold" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.LabelBold.bool"/>
+      </Property>
+      <Property name="LabelColor" id="8836.LabelColor" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+        <Domain name="range" id="8836.LabelColor.range"/>
+      </Property>
+      <Property name="LabelFontFamily" id="8836.LabelFontFamily" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="8836.LabelFontFamily.enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </Domain>
+      </Property>
+      <Property name="LabelFontSize" id="8836.LabelFontSize" number_of_elements="1">
+        <Element index="0" value="7"/>
+        <Domain name="range" id="8836.LabelFontSize.range"/>
+      </Property>
+      <Property name="LabelFormat" id="8836.LabelFormat" number_of_elements="1">
+        <Element index="0" value="%-#6.3g"/>
+      </Property>
+      <Property name="LabelItalic" id="8836.LabelItalic" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.LabelItalic.bool"/>
+      </Property>
+      <Property name="LabelOpacity" id="8836.LabelOpacity" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="8836.LabelOpacity.range"/>
+      </Property>
+      <Property name="LabelShadow" id="8836.LabelShadow" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.LabelShadow.bool"/>
+      </Property>
+      <Property name="LookupTable" id="8836.LookupTable" number_of_elements="1">
+        <Proxy value="8829"/>
+        <Domain name="groups" id="8836.LookupTable.groups"/>
+      </Property>
+      <Property name="NanAnnotation" id="8836.NanAnnotation" number_of_elements="1">
+        <Element index="0" value="NaN"/>
+      </Property>
+      <Property name="NumberOfLabels" id="8836.NumberOfLabels" number_of_elements="1">
+        <Element index="0" value="5"/>
+        <Domain name="range" id="8836.NumberOfLabels.range"/>
+      </Property>
+      <Property name="Orientation" id="8836.Orientation" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="enum" id="8836.Orientation.enum">
+          <Entry value="0" text="Horizontal"/>
+          <Entry value="1" text="Vertical"/>
+        </Domain>
+      </Property>
+      <Property name="OrientationInfo" id="8836.OrientationInfo" number_of_elements="1">
+        <Element index="0" value="1"/>
+      </Property>
+      <Property name="Position" id="8836.Position" number_of_elements="2">
+        <Element index="0" value="0.85"/>
+        <Element index="1" value="0.05"/>
+        <Domain name="range" id="8836.Position.range"/>
+      </Property>
+      <Property name="Position2" id="8836.Position2" number_of_elements="2">
+        <Element index="0" value="0.12"/>
+        <Element index="1" value="0.43"/>
+        <Domain name="range" id="8836.Position2.range"/>
+      </Property>
+      <Property name="Position2Info" id="8836.Position2Info" number_of_elements="2">
+        <Element index="0" value="0.12"/>
+        <Element index="1" value="0.43"/>
+      </Property>
+      <Property name="PositionInfo" id="8836.PositionInfo" number_of_elements="2">
+        <Element index="0" value="0.85"/>
+        <Element index="1" value="0.05"/>
+      </Property>
+      <Property name="RangeLabelFormat" id="8836.RangeLabelFormat" number_of_elements="1">
+        <Element index="0" value="%4.3e"/>
+      </Property>
+      <Property name="Repositionable" id="8836.Repositionable" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.Repositionable.bool"/>
+      </Property>
+      <Property name="Resizable" id="8836.Resizable" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="8836.Resizable.bool"/>
+      </Property>
+      <Property name="Selectable" id="8836.Selectable" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.Selectable.bool"/>
+      </Property>
+      <Property name="TextPosition" id="8836.TextPosition" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="enum" id="8836.TextPosition.enum">
+          <Entry value="1" text="Ticks right/top, annotations left/bottom"/>
+          <Entry value="0" text="Ticks left/bottom, annotations right/top"/>
+        </Domain>
+      </Property>
+      <Property name="Title" id="8836.Title" number_of_elements="1">
+        <Element index="0" value="vtkBlockColors"/>
+      </Property>
+      <Property name="TitleBold" id="8836.TitleBold" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.TitleBold.bool"/>
+      </Property>
+      <Property name="TitleColor" id="8836.TitleColor" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+        <Domain name="range" id="8836.TitleColor.range"/>
+      </Property>
+      <Property name="TitleFontFamily" id="8836.TitleFontFamily" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="8836.TitleFontFamily.enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </Domain>
+      </Property>
+      <Property name="TitleFontSize" id="8836.TitleFontSize" number_of_elements="1">
+        <Element index="0" value="7"/>
+        <Domain name="range" id="8836.TitleFontSize.range"/>
+      </Property>
+      <Property name="TitleItalic" id="8836.TitleItalic" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.TitleItalic.bool"/>
+      </Property>
+      <Property name="TitleJustification" id="8836.TitleJustification" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="enum" id="8836.TitleJustification.enum">
+          <Entry value="0" text="Left"/>
+          <Entry value="1" text="Centered"/>
+          <Entry value="2" text="Right"/>
+        </Domain>
+      </Property>
+      <Property name="TitleOpacity" id="8836.TitleOpacity" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="8836.TitleOpacity.range"/>
+      </Property>
+      <Property name="TitleShadow" id="8836.TitleShadow" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.TitleShadow.bool"/>
+      </Property>
+      <Property name="Visibility" id="8836.Visibility" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="8836.Visibility.bool"/>
+      </Property>
+    </Proxy>
     <Proxy group="representations" type="ScalarBarWidgetRepresentation" id="4085" servers="21">
       <Property name="Enabled" id="4085.Enabled" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -79968,14 +80452,12 @@
         <Element index="3" value="0"/>
         <Element index="4" value="MHDEQ-B"/>
         <Domain name="array_list" id="3879.SelectInputScalars.array_list">
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
           <String text="MHDEQ-Pressure"/>
           <String text="MHDEQ-polflux"/>
           <String text="MHDEQ-torflux"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="3879.SelectInputScalars.field_list">
@@ -80030,7 +80512,6 @@
         <Element index="4" value="MHDEQ-Pressure"/>
         <Domain name="array_list" id="3890.SelectInputScalars.array_list">
           <String text="J"/>
-          <String text="Jacobian"/>
           <String text="MHDEQ-A"/>
           <String text="MHDEQ-B"/>
           <String text="MHDEQ-Density"/>
@@ -80039,7 +80520,6 @@
           <String text="MHDEQ-torflux"/>
           <String text="divB"/>
           <String text="gradB"/>
-          <String text="scaledJacElem"/>
           <String text="scaledJacobian"/>
         </Domain>
         <Domain name="field_list" id="3890.SelectInputScalars.field_list">
@@ -80329,11 +80809,11 @@
         <Element index="0" value="elemind"/>
         <Element index="1" value="0"/>
         <Element index="2" value="Jacobian"/>
-        <Element index="3" value="1"/>
+        <Element index="3" value="0"/>
         <Element index="4" value="scaledJacobian"/>
         <Element index="5" value="1"/>
         <Element index="6" value="scaledJacElem"/>
-        <Element index="7" value="1"/>
+        <Element index="7" value="0"/>
         <Element index="8" value="MHDEQ-Density"/>
         <Element index="9" value="1"/>
         <Element index="10" value="MHDEQ-Pressure"/>
@@ -80351,11 +80831,11 @@
         <Element index="0" value="elemind"/>
         <Element index="1" value="0"/>
         <Element index="2" value="Jacobian"/>
-        <Element index="3" value="1"/>
+        <Element index="3" value="0"/>
         <Element index="4" value="scaledJacobian"/>
         <Element index="5" value="1"/>
         <Element index="6" value="scaledJacElem"/>
-        <Element index="7" value="1"/>
+        <Element index="7" value="0"/>
         <Element index="8" value="MHDEQ-Density"/>
         <Element index="9" value="1"/>
         <Element index="10" value="MHDEQ-Pressure"/>
@@ -80518,9 +80998,9 @@
         <Domain name="bool" id="5979.CenterAxesVisibility.bool"/>
       </Property>
       <Property name="CenterOfRotation" id="5979.CenterOfRotation" number_of_elements="3">
-        <Element index="0" value="1.23313893377781"/>
-        <Element index="1" value="-1.04829708486795"/>
-        <Element index="2" value="0"/>
+        <Element index="0" value="1.24924063682556"/>
+        <Element index="1" value="-1.06349179893732"/>
+        <Element index="2" value="0.0839257538318634"/>
       </Property>
       <Property name="CollectGeometryThreshold" id="5979.CollectGeometryThreshold" number_of_elements="1">
         <Element index="0" value="100"/>
@@ -80674,7 +81154,7 @@
         <Element index="0" value="20"/>
         <Domain name="range" id="5979.RemoteRenderThreshold.range"/>
       </Property>
-      <Property name="Representations" id="5979.Representations" number_of_elements="56">
+      <Property name="Representations" id="5979.Representations" number_of_elements="57">
         <Proxy value="4053"/>
         <Proxy value="4061"/>
         <Proxy value="4069"/>
@@ -80731,6 +81211,7 @@
         <Proxy value="8566"/>
         <Proxy value="8574"/>
         <Proxy value="8582"/>
+        <Proxy value="8836"/>
       </Property>
       <Property name="RotationFactor" id="5979.RotationFactor" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -80832,51 +81313,51 @@
         <Domain name="range" id="5979.ViewTime.range"/>
       </Property>
       <Property name="CameraClippingRange" id="5979.CameraClippingRange" number_of_elements="2">
-        <Element index="0" value="2.84912727703273"/>
-        <Element index="1" value="9.01274221465718"/>
+        <Element index="0" value="3.73162529933104"/>
+        <Element index="1" value="14.2140865209123"/>
       </Property>
       <Property name="CameraClippingRangeInfo" id="5979.CameraClippingRangeInfo" number_of_elements="2">
-        <Element index="0" value="2.84912727703273"/>
-        <Element index="1" value="9.01274221465718"/>
+        <Element index="0" value="3.73162529933104"/>
+        <Element index="1" value="14.2140865209123"/>
       </Property>
       <Property name="CameraFocalPoint" id="5979.CameraFocalPoint" number_of_elements="3">
-        <Element index="0" value="1.23313893377781"/>
-        <Element index="1" value="-1.04829708486796"/>
-        <Element index="2" value="-7.84671658694794e-17"/>
+        <Element index="0" value="1.5693571860226"/>
+        <Element index="1" value="-5.32728450597646"/>
+        <Element index="2" value="0.280275633404118"/>
       </Property>
       <Property name="CameraFocalPointInfo" id="5979.CameraFocalPointInfo" number_of_elements="3">
-        <Element index="0" value="1.23313893377781"/>
-        <Element index="1" value="-1.04829708486796"/>
-        <Element index="2" value="-7.84671658694794e-17"/>
+        <Element index="0" value="1.5693571860226"/>
+        <Element index="1" value="-5.32728450597646"/>
+        <Element index="2" value="0.280275633404118"/>
       </Property>
       <Property name="CameraParallelScale" id="5979.CameraParallelScale" number_of_elements="1">
-        <Element index="0" value="0.94892968346333"/>
+        <Element index="0" value="1.04678205177016"/>
       </Property>
       <Property name="CameraParallelScaleInfo" id="5979.CameraParallelScaleInfo" number_of_elements="1">
-        <Element index="0" value="0.94892968346333"/>
+        <Element index="0" value="1.04678205177016"/>
       </Property>
       <Property name="CameraPosition" id="5979.CameraPosition" number_of_elements="3">
-        <Element index="0" value="-2.82642565214987"/>
-        <Element index="1" value="-4.74310610926975"/>
-        <Element index="2" value="0.956218930737437"/>
+        <Element index="0" value="-4.13181230451214"/>
+        <Element index="1" value="-5.73098285612815"/>
+        <Element index="2" value="0.808682489079099"/>
       </Property>
       <Property name="CameraPositionInfo" id="5979.CameraPositionInfo" number_of_elements="3">
-        <Element index="0" value="-2.82642565214987"/>
-        <Element index="1" value="-4.74310610926975"/>
-        <Element index="2" value="0.956218930737437"/>
+        <Element index="0" value="-4.13181230451214"/>
+        <Element index="1" value="-5.73098285612815"/>
+        <Element index="2" value="0.808682489079099"/>
       </Property>
       <Property name="CameraViewAngle" id="5979.CameraViewAngle" number_of_elements="1">
         <Element index="0" value="30"/>
       </Property>
       <Property name="CameraViewUp" id="5979.CameraViewUp" number_of_elements="3">
-        <Element index="0" value="0.175622809254938"/>
-        <Element index="1" value="0.0613229786951518"/>
-        <Element index="2" value="0.982545734891439"/>
+        <Element index="0" value="0.0803080809147558"/>
+        <Element index="1" value="0.154732746066388"/>
+        <Element index="2" value="0.984686949966609"/>
       </Property>
       <Property name="CameraViewUpInfo" id="5979.CameraViewUpInfo" number_of_elements="3">
-        <Element index="0" value="0.175622809254938"/>
-        <Element index="1" value="0.0613229786951518"/>
-        <Element index="2" value="0.982545734891439"/>
+        <Element index="0" value="0.0803080809147558"/>
+        <Element index="1" value="0.154732746066388"/>
+        <Element index="2" value="0.984686949966609"/>
       </Property>
       <Property name="EyeAngle" id="5979.EyeAngle" number_of_elements="1">
         <Element index="0" value="2"/>
@@ -80962,6 +81443,7 @@
       <Item id="4651" name="VMECBphi.PVLookupTable"/>
       <Item id="4635" name="VMECBr.PVLookupTable"/>
       <Item id="5121" name="VMECDensity.PVLookupTable"/>
+      <Item id="8584" name="cellNormals.PVLookupTable"/>
       <Item id="4167" name="curlB.PVLookupTable"/>
       <Item id="4199" name="dd.PVLookupTable"/>
       <Item id="4239" name="divB.PVLookupTable"/>
@@ -81223,6 +81705,7 @@
       <Item id="6614" name="scaledJacobian.PVLookupTable"/>
       <Item id="6616" name="scaledJacobian.PVLookupTable"/>
       <Item id="6618" name="scaledJacobian.PVLookupTable"/>
+      <Item id="8829" name="vtkBlockColors.PVLookupTable"/>
     </ProxyCollection>
     <ProxyCollection name="piecewise_functions">
       <Item id="4246" name="Bvec.PiecewiseFunction"/>
@@ -81296,6 +81779,7 @@
       <Item id="4650" name="VMECBphi.PiecewiseFunction"/>
       <Item id="4634" name="VMECBr.PiecewiseFunction"/>
       <Item id="5120" name="VMECDensity.PiecewiseFunction"/>
+      <Item id="8583" name="cellNormals.PiecewiseFunction"/>
       <Item id="4166" name="curlB.PiecewiseFunction"/>
       <Item id="4198" name="dd.PiecewiseFunction"/>
       <Item id="4238" name="divB.PiecewiseFunction"/>
@@ -81557,6 +82041,7 @@
       <Item id="6613" name="scaledJacobian.PiecewiseFunction"/>
       <Item id="6615" name="scaledJacobian.PiecewiseFunction"/>
       <Item id="6617" name="scaledJacobian.PiecewiseFunction"/>
+      <Item id="8830" name="vtkBlockColors.PiecewiseFunction"/>
     </ProxyCollection>
     <ProxyCollection name="pq_helper_proxies.11098">
       <Item id="6619" name="RepresentationAnimationHelper"/>
@@ -83583,6 +84068,7 @@
       <Item id="4077" name="ScalarBarWidgetRepresentation4"/>
       <Item id="8574" name="ScalarBarWidgetRepresentation40"/>
       <Item id="8582" name="ScalarBarWidgetRepresentation41"/>
+      <Item id="8836" name="ScalarBarWidgetRepresentation42"/>
       <Item id="4085" name="ScalarBarWidgetRepresentation5"/>
       <Item id="4093" name="ScalarBarWidgetRepresentation6"/>
       <Item id="4101" name="ScalarBarWidgetRepresentation7"/>
@@ -84056,6 +84542,8 @@
       <GlobalPropertyLink global_name="TextAnnotationColor" proxy="8574" property="TitleColor"/>
       <GlobalPropertyLink global_name="TextAnnotationColor" proxy="8582" property="LabelColor"/>
       <GlobalPropertyLink global_name="TextAnnotationColor" proxy="8582" property="TitleColor"/>
+      <GlobalPropertyLink global_name="TextAnnotationColor" proxy="8836" property="LabelColor"/>
+      <GlobalPropertyLink global_name="TextAnnotationColor" proxy="8836" property="TitleColor"/>
     </Links>
   </ServerManagerState>
 </ParaView>

@@ -27,109 +27,53 @@ MODULE MOD_VMEC_Readin
   IMPLICIT NONE
   PUBLIC
 
-!> high precision real numbers
-  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(10, 20)
+  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(15, 307) !working precision 
 !> Pi
-  REAL(KIND = wp), PARAMETER :: Pi    = 3.1415926535897932384626433832795_wp
+!  REAL(wp), PARAMETER :: Pi    = 3.1415926535897932384626433832795_wp
 !> 2 Pi
-  REAL(KIND = wp), PARAMETER :: TwoPi = 6.2831853071795864769252867665590_wp
+  REAL(wp), PARAMETER :: TwoPi = 6.2831853071795864769252867665590_wp
 !> mu_0 (Permeability)
-  REAL(KIND = wp), PARAMETER :: mu0   = 4.0_wp * Pi * 1.0E-7_wp         ! V s / (A m)
-
+  REAL(wp), PARAMETER :: mu0   = 2.0_wp * twoPi * 1.0E-7_wp         ! V s / (A m)
 !> version number
-  REAL(KIND = wp), PARAMETER :: version = 3.75_wp
+  REAL(wp), PARAMETER :: version = 3.75_wp
 
-!> number of flux surfaces in VMEC output
-  INTEGER :: nFluxVMEC
+  INTEGER :: nFluxVMEC       !< number of flux surfaces in VMEC output
+  INTEGER :: mn_mode         !< number of modes (theta,zeta)
+! INTEGER :: mn_mode_nyq     !< number of modes (Nyquist, 2D)
+  INTEGER :: nfp             !< number of field periods
+  LOGICAL :: lasym=.FALSE.   !< if lasym=0, solution is (rmnc,zmns,lmns),
+                             !< if lasym=1 solution is (rmnc,rmns,zmnc,zmns,lmnc,lmns)
+  INTEGER :: mPol            !< poloidal mode number
+  INTEGER :: nTor            !< toroidal mode number
+  INTEGER :: signgs          !< signum of sqrtG
+  INTEGER :: mnmax           !< maximum mode number over m,n
+! INTEGER :: mnmax_nyq       !< maximum mode number over m_nyq,n_nyq
+  REAL(wp) :: b0             !< magnetic field on axis B_0
+  REAL(wp) :: rMajor         !< major radius
+  REAL(wp) :: volume         !< volume
 
-!> number of modes (2D)
-  INTEGER :: mn_mode
+!! vector parameters
+  REAL(wp), ALLOCATABLE :: xm(:)      !< poloidal mode numbers 
+  REAL(wp), ALLOCATABLE :: xn(:)      !< toroidal mode numbers
+! REAL(wp), ALLOCATABLE :: xm_nyq(:)  !< poloidal mode numbers (Nyquist)
+! REAL(wp), ALLOCATABLE :: xn_nyq(:)  !< toroidal mode numbers (Nyquist) 
+  REAL(wp), ALLOCATABLE :: iotaf(:)   !< iota on full mesh
+  REAL(wp), ALLOCATABLE :: presf(:)   !< pressure on full mesh
+  REAL(wp), ALLOCATABLE :: phi(:)     !< toroidal flux on full mesh
+  REAL(wp), ALLOCATABLE :: chi(:)     !< poloidal flux on full mesh
+  REAL(wp), ALLOCATABLE :: rmnc(:, :) !< R(iMode,iFlux) (cosine components on full mesh)
+  REAL(wp), ALLOCATABLE :: rmns(:, :) 
+  REAL(wp), ALLOCATABLE :: zmnc(:, :)
+  REAL(wp), ALLOCATABLE :: zmns(:, :) !< Z(iMode,iFlux) (sine components on full mesh)
+  REAL(wp), ALLOCATABLE :: lmnc(:, :)
+  REAL(wp), ALLOCATABLE :: lmns(:, :) !< lambda(iMode,iFlux) (sine components (read on half mesh, needs to be interpolated on full mesh))
 
-!> number of modes (Nyquist, 2D)
-!  INTEGER :: mn_mode_nyq
+! REAL(wp), ALLOCATABLE :: gmnc(:, :) !< jacobian (cosine components (read on half mesh, interpolated on full
+                                      !< mesh, mnMode_nyqist ))
 
-!> number of modes for magnetic axis (1D)
-!  INTEGER :: nAxis
-
-!> number of field periods
-  INTEGER :: nfp
-
-!> if lasym=0, solution is (rmnc,zmns,lmns), if lasym=1 solution is (rmnc,rmns,zmnc,zmns,lmnc,lmns)
-  LOGICAL :: lasym=.FALSE.
-
-!> dimension of s
-  INTEGER :: nS
-
-!> poloidal mode number
-  INTEGER :: mPol
-
-!> toroidal mode number
-  INTEGER :: nTor
-
-!> mnmax
-  INTEGER :: mnmax
-
-!> mnmax_nyq
-  INTEGER :: mnmax_nyq
-
-!> B_0
-  REAL(KIND = wp) :: b0
-
-!> major radius
-  REAL(KIND = wp) :: rMajor
-
-!> volume
-  REAL(KIND = wp) :: volume
-
-!> signum of sqrtG
-  INTEGER :: signgs
-
-  !! vector parameter
-!> poloidal mode numbers
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: xm
-
-!> toroidal mode numbers
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: xn
-
-!> poloidal mode numbers (Nyquist)
-!  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: xm_nyq
-
-!> toroidal mode numbers (Nyquist)
-!  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: xn_nyq
-
-!> iota on full mesh
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: iotaf
-
-!> pressure on full mesh
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: presf
-
-!> toroidal flux on full mesh
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: phi
-
-!> poloidal flux on full mesh
-  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: chi
-
-!> d(phi)/ds: Toroidal flux derivative on full mesh
-!  REAL(KIND = wp), DIMENSION(:), ALLOCATABLE :: phipf
-
-
-!> R (cosine components on full mesh)
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: rmnc
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: rmns
-
-!> z (sine components on full mesh)
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: zmnc
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: zmns
-
-!> lambda (sine components (read on half mesh, needs to be interpolated on full mesh))
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: lmnc
-  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: lmns
-
-!> jacobian (cosine components (read on half mesh, interpolated on full
-!> mesh, mnMode_nyqist ))
-!  REAL(KIND = wp), DIMENSION(:, :), ALLOCATABLE :: gmnc
-
-
+INTERFACE ReadVMEC
+  MODULE PROCEDURE ReadVMEC
+END INTERFACE ReadVMEC
 
 CONTAINS
 
@@ -137,18 +81,19 @@ CONTAINS
 !> read VMEC2000 netcdf output file
 ! ----------------------------------------------------------------------
 
-  SUBROUTINE ReadVmec(fileName)
+SUBROUTINE ReadVMEC(fileName)
+!=====================================================================
+  USE MOD_VMEC_Vars
+  IMPLICIT NONE
+  INCLUDE "netcdf.inc"
+! INPUT/OUTPUT VARIABLES
+  CHARACTER(LEN = *), INTENT(IN) :: fileName
+!---------------------------------------------------------------------
+! LOCAL VARIABLES
+  INTEGER :: aStat, aError, ioError, ncid, id
+!=====================================================================
 
-    INCLUDE "netcdf.inc"
-  !=====================================================================
-  ! INPUT/OUTPUT VARIABLES
-    CHARACTER(LEN = *), INTENT(IN) :: fileName
-  !---------------------------------------------------------------------
-  ! LOCAL VARIABLES
-    INTEGER :: aStat, aError, ioError, ncid, id
-  !=====================================================================
-
-    WRITE(*,*)'VMEC READ WOUT FILE...'
+    WRITE(*,'(4X,A)')'VMEC READ WOUT FILE...'
     !! open NetCDF input file
     ioError = NF_OPEN(TRIM(fileName), NF_NOWRITE, ncid)
     IF (ioError /= 0) THEN
@@ -167,10 +112,6 @@ CONTAINS
     !! number of fourier components of b_u, b_v, b_s
 !    ioError = ioError + NF_INQ_DIMID(ncid, "mn_mode_nyq", id)
 !    ioError = ioError + NF_INQ_DIMLEN(ncid, id, mn_mode_nyq)
-    !! number of fourier components of raxis, zaxis
-!    ioError = ioError + NF_INQ_DIMID(ncid, "n-tor", id)
-!    ioError = ioError + NF_INQ_DIMLEN(ncid, id, nAxis)
-!    IF (ioError /= 0)  STOP 'VMEC READIN: problem reading n-tor'
 
     !! get number of field periods
     ioError = ioError + NF_INQ_VARID(ncid, "nfp", id)
@@ -206,7 +147,7 @@ CONTAINS
     !! get mnmax_nyq
     !! check the sign of b0
     IF (b0 < 0) THEN
-      WRITE(*,*) "  VMEC run with b0 < 0 !!!"
+      WRITE(*,'(4X,A)') "  VMEC run with b0 < 0 !!!"
     END IF
     !! get signgs
     ioError = ioError + NF_INQ_VARID(ncid, "signgs", id)
@@ -296,15 +237,19 @@ CONTAINS
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1 /),&
          (/ nFluxVMEC /), phi(:))
     IF (ioError /= 0)  STOP 'VMEC READIN: problem reading phi'
+
     !! scale toroidal flux to get internal VMEC Phi
     phi(:nFluxVMEC) = REAL(signgs, wp) * phi(:nFluxVMEC) / TwoPi
+
     !! read chi
     ioError = NF_INQ_VARID(ncid, "chi", id)
     ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1 /),&
          (/ nFluxVMEC /), chi(:))
     IF (ioError /= 0)  STOP 'VMEC READIN: problem reading chi'
-    !! scale poloidal flux to get internal VMEC chi
+
+    !! scale poloidal flux to get internal VMEC chi, WITHOUT SIGNGS (so that iota=chi'/phi' >0 )
     chi(:nFluxVMEC) = chi(:nFluxVMEC) / TwoPi
+
     !! read phipf
 !    ioError = NF_INQ_VARID(ncid, "phipf", id)
 !    ioError = ioError + NF_GET_VARA_DOUBLE(ncid, id, (/ 1 /),&
@@ -354,57 +299,8 @@ CONTAINS
     END IF
 
     ioError = NF_CLOSE(ncid)
-    WRITE(*,*)'...DONE.'
+    WRITE(*,'(4X,A)')'...DONE.'
 
-  END SUBROUTINE ReadVmec
-
-! ----------------------------------------------------------------------
-!> recompute lambda at the full flux surfaces via an elliptic solution on 
-!> each flux surface
-! ----------------------------------------------------------------------
-
-  SUBROUTINE RecomputeLambda()
-  !=====================================================================
-  ! INPUT/OUTPUT VARIABLES
-  USE MOD_Basis1D,ONLY:SOLVE
-  !---------------------------------------------------------------------
-  ! LOCAL VARIABLES
-    INTEGER          :: iFlux,iMode,jMode,i_m,i_n,np_m,np_n,nyq
-    REAL(KIND = wp),ALLOCATABLE  :: cosMN(:,:,:),sinMN(:,:,:)
-    REAL(KIND = wp),ALLOCATABLE  :: J(:,:),g_tt(:,:),g_tz(:,:),g_zz(:,:)
-    REAL(KIND = wp)              :: Amat(mn_mode,mn_mode)
-    REAL(KIND = wp)              :: RHS(mn_mode)
-    REAL(KIND = wp)              :: lambda(mn_mode)
-  !=====================================================================
-  nyq=4
-  np_m=1+nyq*MAXVAL(ABS(xm)) !m_points [0,2pi]
-  np_n=1+nyq*MAXVAL(ABS(xn))/nfp !n_points [0,2pi/nfs] ->  *nfp in integration
-
-  ALLOCATE(cosMN(mn_mode,0:np_m,0:np_n))
-  ALLOCATE(sinMN(mn_mode,0:np_m,0:np_n))
-  ALLOCATE(g_tt(0:np_m,0:np_n))
-  ALLOCATE(g_tz(0:np_m,0:np_n))
-  ALLOCATE(   J(0:np_m,0:np_n))
-  DO i_m=0,np_m; DO i_n=0,np_n
-    cosMN(:,i_m,i_n)=COS(twoPi*(xm(:)*REAL(i_m,wp)/REAL(np_m+1,wp)-xn(:)*REAL(i_n,wp)/REAL(nfp*(np_n+1),wp)))
-    sinMN(:,i_m,i_n)=SIN(twoPi*(xm(:)*REAL(i_m,wp)/REAL(np_m+1,wp)-xn(:)*REAL(i_n,wp)/REAL(nfp*(np_n+1),wp)))
-  END DO; END DO !i_m,i_n
-
-  DO iFlux=2,nFluxVMEC
-    lambda=lmns(iFlux,:)
-    DO jMode=1,mn_mode; DO iMode=1,mn_mode
-      Amat(iMode,jMode) =SUM(( ( g_tt(:,:)*(-xn(iMode))                  &  ! 1/J g_theta,theta dlambda_dzeta dsigma_dtheta
-                                -g_tz(:,:)*( xm(iMode))*( xm(jMode)))    &  !-1/J g_theta,zeta dlambda_dtheta dsigma_dtheta
-                              +( g_tz(:,:)*(-xn(iMode))                  &  !+1/J g_zeta,theta dlambda_dzeta dsigma_dzeta
-                                -g_zz(:,:)*( xm(iMode))*(-xn(jMode))))   &  !-1/J g_zeta,zeta  dlambda_dtheta dsigma_dzeta
-                             *(cosMN(iMode,:,:)**2) )
-      RHS (jMode)        =SUM(( ( iotaf(iFlux)*g_tt(:,:)*(-xn(iMode))       &            ! 1/J g_theta,theta dlambda_dzeta dsigma_dtheta
-                                )))!....
-    END DO; END DO !iMode,jMode
-    
-    lmns(iFlux,:)=SOLVE(Amat,RHS)  
-  END DO
-  DEALLOCATE(cosMN,sinMN)
-  END SUBROUTINE RecomputeLambda
+  END SUBROUTINE ReadVMEC
 
 END MODULE MOD_VMEC_Readin

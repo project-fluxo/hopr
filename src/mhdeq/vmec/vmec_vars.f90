@@ -29,37 +29,29 @@ MODULE MOD_VMEC_Vars
 IMPLICIT NONE
 PUBLIC
 !-----------------------------------------------------------------------------------------------------------------------------------
-! GLOBAL VARIABLES 
-LOGICAL             :: useVMEC
-LOGICAL             :: useSFL                    !use straight-field line coordinates
-CHARACTER(LEN = 256):: VMECdataFile
-INTEGER,ALLOCATABLE :: xmAbs(:)                  ! abs |xm(iMode)|
-REAL,ALLOCATABLE    :: Phi_prof(:)               ! TOROIDAL flux profile (called phi_pf in VMEC)
-REAL,ALLOCATABLE    :: Phinorm_prof(:)           ! normalized TOROIDAL flux profile 
-REAL,ALLOCATABLE    :: chi_prof(:)               ! POLOIDAL flux profile ( called chi_pf in VMEC)
 
-REAL,ALLOCATABLE    :: rho(:)                    ! := sqrt(phinorm) at all flux surface 
-REAL,ALLOCATABLE    :: pres_Spl(:,:)             ! Spline coefficients in (rho) for Pressure, iota 
-REAL,ALLOCATABLE    :: Phi_Spl(:,:)       
-REAL,ALLOCATABLE    :: chi_Spl(:,:)       
-REAL,ALLOCATABLE    :: Rmnc_Spl(:,:,:)           ! modified spline coefficients of Rmnc
-REAL,ALLOCATABLE    :: Rmns_Spl(:,:,:)           ! modified spline coefficients of Rmns
-REAL,ALLOCATABLE    :: lmnc_Spl(:,:,:)           !
-REAL,ALLOCATABLE    :: lmns_Spl(:,:,:)           !
-REAL,ALLOCATABLE    :: Zmnc_Spl(:,:,:)           !
-REAL,ALLOCATABLE    :: Zmns_Spl(:,:,:)           !
-!not used anymore
-!INTEGER,ALLOCATABLE :: xmAbs_nyq(:)              ! abs |xm(iMode)|
-!REAL,ALLOCATABLE    :: gmnc_nyq_Spl(:,:,:)       !
-!REAL,ALLOCATABLE    :: iota_Spl(:,:)       
-!REAL,ALLOCATABLE    :: dPhi_ds_Spl(:,:)          ! two modes in vmec: if toroidal flux is used for profiles, 
-!                                                 ! then s=Psinorm [0,1], Psi(s)=Psi(1)+(Psi(n)-Psi(1))*s,dPsi/ds=Psi(n)-Psi(1). 
-!                                                 ! VMEC can also use the normalized polodial fluxes for s (RFP=.TRUE. option),
-!                                                 ! then dPsi/ds = dPsi/dchinorm = (chi(n)-chi(1))/iota
-!-----------------------------------------------------------------------------------------------------------------------------------
-! Private Part ---------------------------------------------------------------------------------------------------------------------
-! Public Part ----------------------------------------------------------------------------------------------------------------------
-! Vandermande and D matrices
+INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(15, 307) !working precision 
+
+! GLOBAL VARIABLES 
+LOGICAL                 :: useVMEC                   !< main switch
+LOGICAL                 :: useSFL                    !< use straight-field line coordinates
+CHARACTER(LEN = 256)    :: VMECdataFile
+INTEGER,ALLOCATABLE     :: xmAbs(:)                  !< |xm(iMode)|, 1 for m=0, 2 for even, 3 for odd
+REAL(wp),ALLOCATABLE    :: Phi_prof(:)               !< TOROIDAL flux profile (called phi in VMEC)
+REAL(wp),ALLOCATABLE    :: Phinorm_prof(:)           !< normalized TOROIDAL flux profile 
+REAL(wp),ALLOCATABLE    :: chi_prof(:)               !< POLOIDAL flux profile (called chi in VMEC)
+
+REAL(wp),ALLOCATABLE    :: rho(:)                    !< := sqrt(phinorm) at all flux surface 
+REAL(wp),ALLOCATABLE    :: pres_Spl(:,:)             !< Spline coefficients in (rho) for Pressure, (1:4,nFluxVMEC)
+REAL(wp),ALLOCATABLE    :: Phi_Spl(:,:)              !< Spline coefficients in (rho) for Phi, (1:4,nFluxVMEC)
+REAL(wp),ALLOCATABLE    :: chi_Spl(:,:)              !< Spline coefficients in (rho) for chi, (1:4,nFluxVMEC)
+REAL(wp),ALLOCATABLE    :: Rmnc_Spl(:,:,:)           !< modified spline coefficients R cosine, (1:4,iFlux,iMode)
+REAL(wp),ALLOCATABLE    :: Rmns_Spl(:,:,:)           !< modified spline coefficients R sine,   (1:4,iFlux,iMode)
+REAL(wp),ALLOCATABLE    :: lmnc_Spl(:,:,:)           !< modified spline coefficients of lambda cosine , (1:4,iFlux,iMode)
+REAL(wp),ALLOCATABLE    :: lmns_Spl(:,:,:)           !< modified spline coefficients of lambda sine,   (1:4,iFlux,iMode)
+REAL(wp),ALLOCATABLE    :: Zmnc_Spl(:,:,:)           !< modified spline coefficients of Z cosine, (1:4,iFlux,iMode)
+REAL(wp),ALLOCATABLE    :: Zmns_Spl(:,:,:)           !< modified spline coefficients of Z sine,   (1:4,iFlux,iMode)
+
 !===================================================================================================================================
 END MODULE MOD_VMEC_Vars
 

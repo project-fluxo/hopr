@@ -40,12 +40,12 @@ CONTAINS
 
 SUBROUTINE RecomputeLambda(np_m,np_n)
 !=====================================================================
-! INPUT/OUTPUT VARIABLES
 USE MOD_Basis1D,    ONLY: SOLVE
 USE MOD_VMEC_vars,  ONLY: xmabs,rho,Rmnc_Spl,Rmns_Spl,Zmnc_Spl,Zmns_Spl
 USE MOD_VMEC_Readin,ONLY: Rmnc,Rmns,Zmnc,Zmns,lmnc,lmns,iotaf,lasym,xm,xn
 USE MOD_VMEC_Readin,ONLY: nfp,nFluxVMEC,mn_mode,twoPi
 USE SPLINE1_MOD, ONLY: SPLINE1_EVAL
+IMPLICIT NONE
 !---------------------------------------------------------------------
 ! INPUT VARIABLES
   INTEGER          :: np_m !< number of points for integration in theta 

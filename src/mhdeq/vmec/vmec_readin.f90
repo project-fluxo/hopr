@@ -75,6 +75,10 @@ INTERFACE ReadVMEC
   MODULE PROCEDURE ReadVMEC
 END INTERFACE ReadVMEC
 
+INTERFACE FinalizeReadVMEC
+  MODULE PROCEDURE FinalizeReadVMEC
+END INTERFACE FinalizeReadVMEC
+
 CONTAINS
 
 ! ----------------------------------------------------------------------
@@ -93,7 +97,7 @@ SUBROUTINE ReadVMEC(fileName)
   INTEGER :: aStat, aError, ioError, ncid, id
 !=====================================================================
 
-    WRITE(*,'(4X,A)')'VMEC READ WOUT FILE...'
+    WRITE(*,'(4X,A)')'VMEC READ WOUT FILE "'//TRIM(fileName)//'" ...'
     !! open NetCDF input file
     ioError = NF_OPEN(TRIM(fileName), NF_NOWRITE, ncid)
     IF (ioError /= 0) THEN
@@ -301,6 +305,35 @@ SUBROUTINE ReadVMEC(fileName)
     ioError = NF_CLOSE(ncid)
     WRITE(*,'(4X,A)')'...DONE.'
 
-  END SUBROUTINE ReadVMEC
+END SUBROUTINE ReadVMEC
+
+!===================================================================================================================================
+!> Finalize: Deallocate module variables 
+!! 
+!===================================================================================================================================
+SUBROUTINE FinalizeReadVMEC()
+  IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT/OUTPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+!===================================================================================================================================
+DEALLOCATE( xm       )
+DEALLOCATE( xn       )
+!DEALLOCATE( xm_nyq   )
+!DEALLOCATE( xn_nyq   )
+DEALLOCATE( iotaf    )    
+DEALLOCATE( presf    )
+DEALLOCATE( phi      )
+DEALLOCATE( chi      )
+DEALLOCATE( rmnc     )
+DEALLOCATE( rmns     )
+DEALLOCATE( zmnc     )
+DEALLOCATE( zmns     )
+DEALLOCATE( lmnc     )
+DEALLOCATE( lmns     )
+
+!SDEALLOCATE(gmnc)
+END SUBROUTINE FinalizeReadVMEC
 
 END MODULE MOD_VMEC_Readin

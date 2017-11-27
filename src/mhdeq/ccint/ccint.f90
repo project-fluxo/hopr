@@ -34,12 +34,16 @@ PUBLIC
 ! Private Part ---------------------------------------------------------------------------------------------------------------------
 ! Public Part ----------------------------------------------------------------------------------------------------------------------
 
-INTERFACE CCint_Init
-  MODULE PROCEDURE CCint_Init 
+INTERFACE InitCCint
+  MODULE PROCEDURE InitCCint
 END INTERFACE
 
 INTERFACE CCint 
   MODULE PROCEDURE CCint 
+END INTERFACE
+
+INTERFACE FinalizeCCint 
+  MODULE PROCEDURE FinalizeCCint  
 END INTERFACE
 
 ABSTRACT INTERFACE 
@@ -57,7 +61,7 @@ END INTERFACE
 CONTAINS
 
 
-SUBROUTINE CCint_Init()
+SUBROUTINE InitCCint()
 !===================================================================================================================================
 ! do a nested integration using clenshaw curtis recursive quadrature
 !===================================================================================================================================
@@ -160,7 +164,7 @@ DEALLOCATE(CC)
 CALL CCintTest()
 
 WRITE(UNIT_stdOut,'(A)')'  DONE.'
-END SUBROUTINE CCInt_Init
+END SUBROUTINE InitCCInt
 
 
 FUNCTION CCint(tol,FINT,converged) RESULT(res)
@@ -255,5 +259,25 @@ CONTAINS
   END FUNCTION FI
 
 END SUBROUTINE CCIntTest
+
+
+!===================================================================================================================================
+!> Finalize Clenshaw-curtis module
+!!
+!===================================================================================================================================
+SUBROUTINE FinalizeCCint()
+! MODULES
+USE MOD_CCInt_vars
+IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! OUTPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+!===================================================================================================================================
+DEALLOCATE(Rcc)
+
+END SUBROUTINE FinalizeCCInt
 
 END MODULE MOD_CCInt

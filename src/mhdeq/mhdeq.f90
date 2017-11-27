@@ -9,7 +9,7 @@
 ! /____//   /____//  /______________//  /____//           /____//   |_____/)    ,X`      XXX`
 ! )____)    )____)   )______________)   )____)            )____)    )_____)   ,xX`     .XX`
 !                                                                           xxX`      XXx
-! Copyright (C) 2015  Prof. Claus-Dieter Munz <munz@iag.uni-stuttgart.de>
+! Copyright (C) 2017  Florian Hindenlang <hindenlang@gmail.com>
 ! This file is part of HOPR, a software for the generation of high-order meshes.
 !
 ! HOPR is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
@@ -44,8 +44,13 @@ END INTERFACE
 !  MODULE PROCEDURE MapToMHDEQ
 !END INTERFACE
 
+INTERFACE FinalizeMHDEQ 
+  MODULE PROCEDURE FinalizeMHDEQ
+END INTERFACE
+
 PUBLIC::InitMHDEQ
 PUBLIC::MapToMHDEQ
+PUBLIC::FinalizeMHDEQ
 !===================================================================================================================================
 
 CONTAINS
@@ -134,5 +139,37 @@ CASE(2)
   CALL MapToSolov(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 END SELECT
 END SUBROUTINE MapToMHDEQ 
+
+!===================================================================================================================================
+!> Finalize Module
+!!
+!===================================================================================================================================
+SUBROUTINE FinalizeMHDEQ 
+! MODULES
+USE MOD_MHDEQ_Vars
+USE MOD_VMEC,  ONLY:FinalizeVMEC
+USE MOD_Solov, ONLY:FinalizeSolov
+
+IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! OUTPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+!===================================================================================================================================
+SELECT CASE(whichEquilibrium)
+CASE(1)
+  CALL FinalizeVMEC()
+CASE(2)
+  CALL FinalizeSolov()
+END SELECT
+
+DEALLOCATE(MHDEQoutdataGL)
+DEALLOCATE(MHDEQdataEq)
+DEALLOCATE(RhoCoefs)
+
+
+END SUBROUTINE FinalizeMHDEQ
 
 END MODULE MOD_MHDEQ

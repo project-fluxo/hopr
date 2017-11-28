@@ -295,6 +295,7 @@ IF(HOPR_MPI)
   MESSAGE(STATUS "MPI Compiler: " ${MPI_Fortran_COMPILER})
 ENDIF()
 
+
 # =========================================================================
 # NETCDF (locally installed only!)
 # =========================================================================

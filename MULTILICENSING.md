@@ -8,6 +8,23 @@ within HOPR are also available under the terms of the MIT/Expat license:
 - src/readin/readintools.f90
 - src/output/output_vtk.f90
 
+and specifically in the vmec branch:
+
+- src/mhdeq/mhdeq_vars.f90
+- src/mhdeq/mhdeq.f90
+- src/mhdeq/mhdeq_tools.f90
+- src/mhdeq/ccint/ccint_vars.f90
+- src/mhdeq/ccint/ccint.f90
+- src/mhdeq/solov/solov_vars.f90
+- src/mhdeq/solov/solov.f90
+- src/mhdeq/solov/newton.f90
+- src/mhdeq/solov/psieval.f90
+- src/mhdeq/vmec/vmec.f90
+- src/mhdeq/vmec/vmec_lambda.f90
+- src/mhdeq/vmec/vmec_readin.f90
+- src/mhdeq/vmec/vmec_vars.f90
+
+
 ## MIT/Expat License:
 ```
 Copyright (c) 2017 Claus-Dieter Munz

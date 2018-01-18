@@ -370,16 +370,16 @@ CASE(90,91,92,93,94)
     x(1)=x(1)+2.*phi/iota !x domain lenth is 2, iota =1 and z=1 => one full shear
      
     IF(PostDeform_R0.GT.0.) THEN
-      xout(1)=PostDeform_R0*x(2) *COS(Pi*x(1))
-      xout(2)=PostDeform_R0*x(2) *SIN(Pi*x(1))
+      xout(1)=PostDeform_R0*x(2) *COS(-Pi*x(1))
+      xout(2)=PostDeform_R0*x(2) *SIN(-Pi*x(1))
       IF(PostDeform_Rtorus.LT.0.)THEN
         xout(3)=phi*PostDeform_Lz !cylinder
       ELSE !torus, z_in must be [0,1] and periodic  !!, torus around z axis ,x =R*cos(phi), y=-R*sin(phi)!!!
         !xout(1)=xout(1)
         xout(3)=xout(2)
         !map R,Z to X,Y,Z
-        xout(2)=-(xout(1)+PostDeform_Rtorus)*SIN(-2*Pi*phi)
-        xout(1)= (xout(1)+PostDeform_Rtorus)*COS(-2*Pi*phi)
+        xout(2)=-(xout(1)+PostDeform_Rtorus)*SIN(2*Pi*phi)
+        xout(1)= (xout(1)+PostDeform_Rtorus)*COS(2*Pi*phi)
       END IF
     ELSE 
       xout(:)=x(:) !keep logical box but sheared

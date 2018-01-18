@@ -353,8 +353,19 @@ IF(meshPostDeform.GT.0) THEN
   PostDeform_Lz=GETREAL('PostDeform_Lz','1.')
   PostDeform_sq=GETREAL('PostDeform_sq','0.')
   PostDeform_Rtorus=GETREAL('PostDeform_Rtorus','-1.') !from cyl-> torus
+
+  postConnect=GETINT('postConnect','0')
+  IF(postConnect.EQ.2)THEN
+    IF(nVV.GT.0)THEN
+      tmpInt=  CNTSTR('postVV','0')
+      IF(tmpInt.NE.nVV) STOP 'postVV must be specified for all previous vv!'
+      ALLOCATE(postVV(3,nVV))
+      DO i=1,nVV
+        postVV(:,i)=GETREALARRAY('postvv',3)
+      END DO
+    END IF
+  END IF
 END IF !PostDeform
-postConnect=GETINT('postConnect','0')
 
 ! Connect
 ConformConnect=GETLOGICAL('ConformConnect','.TRUE.') ! Fast connect for conform mesh
@@ -455,10 +466,10 @@ IMPLICIT NONE
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES 
-TYPE(tElem),POINTER :: Elem  ! ?
-TYPE(tSide),POINTER :: Side    ! ?
-LOGICAL             :: curvedFound  ! ?
-INTEGER             :: iElem  ! ?
+TYPE(tElem),POINTER :: Elem
+TYPE(tSide),POINTER :: Side 
+LOGICAL             :: curvedFound 
+INTEGER             :: i,iElem  
 !===================================================================================================================================
 CALL Timer(.TRUE.)
 WRITE(UNIT_stdOut,'(132("="))')
@@ -565,7 +576,7 @@ IF(useCurveds.AND.Logging)   CALL CountSplines()  ! In case of restart there can
 IF(OrientZ) CALL OrientElemsToZ() 
 
 IF(MeshMode .GT. 0)THEN
-  CALL Connect(reconnect=.FALSE.,deletePeriodic=.FALSE.)                           ! Create connection between elements
+  CALL Connect(reconnect=.FALSE.)                           ! Create connection between elements
   IF(useCurveds.AND.Logging) CALL CountSplines()  ! In case of restart there can be splines
 END IF
 CALL buildEdges()
@@ -665,21 +676,26 @@ IF(useSpaceFillingCurve)THEN
   CALL SpaceFillingCurve(nMeshElems)
 END IF
 
-CALL PostDeform()
+IF(MeshPostDeform.NE.0)THEN
+  CALL PostDeform()
+  
+  SELECT CASE(postConnect)
+  CASE(0) !do nothing
+  CASE(1) !reconnect all sides
+    CALL Connect(reconnect=.TRUE.)                           ! Create connection between elements
+  CASE(2) !reconnect all sides, overwrite periodic connections 
+    DO i=1,nVV
+      vv(:,i)=postVV(:,i)
+    END DO
+    CALL Connect(reconnect=.TRUE.)                           ! Create connection between elements
+  END SELECT !postConnect
 
-SELECT CASE(postConnect)
-CASE(0) !do nothing
-CASE(1) !reconnect all sides
-  CALL Connect(reconnect=.TRUE.,deletePeriodic=.FALSE.)                           ! Create connection between elements
-CASE(2) !reconnect all sides, delete periodic connections (sides on top by postdeform)
-  CALL Connect(reconnect=.TRUE.,deletePeriodic=.TRUE.)                           ! Create connection between elements
-END SELECT !postConnect
-
-IF(mortarFound) THEN
-  IF(doRebuildMortarGeometry) CALL RebuildMortarGeometry()
-  !after rebuild , mortars should be fine, but checking is better:
-  CALL CheckMortarWaterTight()
-END IF !mortarFound
+  IF(mortarFound) THEN
+    IF(doRebuildMortarGeometry) CALL RebuildMortarGeometry()
+    !after rebuild , mortars should be fine, but checking is better:
+    CALL CheckMortarWaterTight()
+  END IF !mortarFound
+END IF
 
 ! apply meshscale before output (default)
 IF(doScale.AND.postScale) CALL ApplyMeshScale(FirstElem)

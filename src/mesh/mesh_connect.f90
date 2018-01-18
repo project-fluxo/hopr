@@ -59,7 +59,7 @@ INTEGER :: next2(4,3:4)=RESHAPE((/3,1,2,0,3,4,1,2/),SHAPE(next2))
 
 CONTAINS
 
-SUBROUTINE Connect(reconnect,deletePeriodic)
+SUBROUTINE Connect(reconnect)
 !===================================================================================================================================
 ! Eliminates multiple nodes, checks periodic boundary conditions and connects elements to their neighbours.
 !===================================================================================================================================
@@ -77,7 +77,6 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! INPUT VARIABLES
 LOGICAL,INTENT(IN)        :: reconnect
-LOGICAL,INTENT(IN)        :: deletePeriodic
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -88,10 +87,12 @@ TYPE(tSide),POINTER       :: pSide  ! ?
 INTEGER                   :: iNode,i  ! ?
 INTEGER                   :: nInner(2),nPeriodic(2)  ! ?
 INTEGER                   :: nBCSides,nTotalSides,nPeriodicSides,connectedSides  ! ?
+CHARACTER(LEN=20)         :: conn
 !===================================================================================================================================
 CALL Timer(.TRUE.)
 WRITE(UNIT_stdOut,'(132("~"))')
-WRITE(UNIT_stdOut,*)'Mesh connect starts'
+conn=MERGE("RE-connect","Connect   ",reconnect)
+WRITE(UNIT_stdOut,*)'Mesh '//TRIM(conn)//' starts'
 
 ! Build element sides (side-node mapping) according to cgns standard
 Elem=>FirstElem
@@ -113,9 +114,6 @@ DO WHILE(ASSOCIATED(Elem))
     nTotalSides=nTotalSides+1
     IF (ASSOCIATED(Side%BC)) THEN
       nBCSides=nBCSides+1
-      IF(deletePeriodic) THEN
-        IF(Side%BC%BCType .EQ. 1) Side%BC%BCtype=0
-      END IF
       IF (Side%BC%BCType .EQ. 0) THEN
         CALL deleteBC(Side%BC)
         nBCSides=nBCSides-1
@@ -125,10 +123,10 @@ DO WHILE(ASSOCIATED(Elem))
         nPeriodicSides=nPeriodicSides+1
         IF (Side%BC%BCalphaInd.EQ.0) &
           CALL abort(__STAMP__, &
-            'No displacement vector vv assigned to periodic BC')
+            TRIM(conn)//': No displacement vector vv assigned to periodic BC')
         IF (abs(Side%BC%BCalphaInd).GT.nVV)   &
           CALL abort(__STAMP__, &
-            'No defined displacement vector vv assigned to periodic BC')
+            TRIM(conn)//':No defined displacement vector vv assigned to periodic BC')
       END IF
     END IF
     Side=>Side%nextElemSide
@@ -178,20 +176,20 @@ CALL GlobalUniqueNodes()
 
 !CALL buildEdges(oriented=.FALSE.)
 
-WRITE(UNIT_stdOut,'(A)')'Connect Conforming inner and periodic sides...'
+WRITE(UNIT_stdOut,'(A)')TRIM(conn)//' Conforming inner and periodic sides...'
 CALL ConnectMesh()
 connectedSides=nConformingSides
-WRITE(UNIT_stdOut,'(A)')'Connect Non-Conforming inner and periodic sides...'
+WRITE(UNIT_stdOut,'(A)')TRIM(conn)//' Non-Conforming inner and periodic sides...'
 DO i=1,10
   IF(connectedSides.NE.nInnerSides)THEN
-    IF(i.GT.1) WRITE(UNIT_stdOut,'(A)')'Not all Non-Conforming could be connected in first run, try again...'
+    IF(i.GT.1) WRITE(UNIT_stdOut,'(A)')'Not all Non-Conforming could be '//TRIM(conn)//'ed in first run, try again...'
   ELSE
     EXIT
   END IF
   CALL NonconformConnectMesh(reconnect)
   IF(nNonConformingSides.EQ.0) EXIT
   connectedSides=connectedSides+nNonConformingSides
-  WRITE(UNIT_StdOut,*)'   --> ',connectedSides,' sides of ', nInnerSides,'  sides connected.'
+  WRITE(UNIT_StdOut,*)'   --> ',connectedSides,' sides of ', nInnerSides,'  sides '//TRIM(conn)//'ed.'
 END DO
 
 ! 4. Check connectivity
@@ -206,7 +204,7 @@ DO WHILE(ASSOCIATED(Elem))
     Side%tmp2=0
     IF(Side%LocSide .LE. 0) &
       CALL abort(__STAMP__, &
-        'Mesh Connect: Side%LocSide not set!')
+        'Mesh '//TRIM(conn)//': Side%LocSide not set!')
     IF (ASSOCIATED(Side%BC)) THEN
       IF(Side%BC%BCType .EQ. 1) THEN
         nPeriodic(1)=nPeriodic(1)+1
@@ -252,10 +250,10 @@ IF(nInner(2)+nPeriodic(2) .GT. 0) THEN
   WRITE(*,*) 'Periodic sides ',nPeriodic(2),' of ',nPeriodic(1),' sides missing.'
   IF(nPeriodic(2).GT.0) CALL BCVisu()
   CALL abort(__STAMP__, &
-    'Sides with missing connection found.')
+    TRIM(conn)//': Sides with missing connection found.')
 END IF
 
-WRITE(UNIT_stdOut,'(A,F0.3,A)')'Mesh Connect completed with success.  '
+WRITE(UNIT_stdOut,'(A,F0.3,A)')'Mesh '//TRIM(conn)//' completed with success.  '
 CALL Timer(.FALSE.)
 END SUBROUTINE Connect
 

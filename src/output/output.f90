@@ -110,6 +110,16 @@ dosortIJK=GETLOGICAL('doSortIJK','.FALSE.')
 useSpaceFillingCurve=GETLOGICAL('useSpaceFillingCurve','.TRUE.')
 sfc_boundbox=GETINT('sfc_boundbox','2')
 
+outputNodeTypeStr=GETSTR('outputNodeType','EQUIDISTANT')
+IF(TRIM(outputNodeTypeStr).EQ.'EQUIDISTANT') THEN
+  outputNodeType=0
+ELSEIF(TRIM(outputNodeTypeStr).EQ.'GAUSS-LOBATTO') THEN
+  outputNodeType=1
+ELSE
+  STOP 'outputNodeType currently only EQUIDISTANT or GAUSS-LOBATTO'
+END IF
+
+
 OutputInitDone=.TRUE.
 WRITE(UNIT_stdOut,'(A)')' INIT OUTPUT DONE!'
 WRITE(UNIT_StdOut,'(132("-"))')

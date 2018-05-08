@@ -73,5 +73,12 @@ INTEGER,ALLOCATABLE            :: VisuHexaMapInv(:,:,:)
 INTEGER,ALLOCATABLE            :: edgeToTria(:,:)        ! mapping from edges of a triangle to surface
 INTEGER,ALLOCATABLE            :: edgeToQuad(:,:)        ! mapping from edges of a quadrangle to surface
 INTEGER,ALLOCATABLE            :: MapSideToVol(:,:,:)    ! iVolNode=MapSideToVol(iSideNode,Side%locSide,Elem%nNodes)
+!-----------------------------------------------------------------------------------------------------------------------------------
+! NodeType (0:Equidistant, 1: Gauss-Lobatto) 
+!-----------------------------------------------------------------------------------------------------------------------------------
+INTEGER                     :: CurrentNodeType = 0 
+REAL,ALLOCATABLE            :: RefNodeXi(:,:)
+REAL,ALLOCATABLE            :: Vdm_AtoB(:,:,:,:)
+
 !===================================================================================================================================
 END MODULE MOD_Basis_Vars

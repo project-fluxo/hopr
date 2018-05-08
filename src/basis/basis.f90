@@ -89,10 +89,55 @@ nAnalyze=GETINT('nAnalyze',tmpstr)
 IF(nVisu.LT.1)THEN
   CALL abort(__STAMP__,'nVisu has to be >= 1')
 END IF
+
+CurrentNodeType=0
+CALL fillNodeTypes()
+
 CALL fillBasisMapping()
 WRITE(UNIT_stdOut,'(A)')' INIT BASIS DONE!'
 WRITE(UNIT_StdOut,'(132("-"))')
 END SUBROUTINE InitBasis
+
+
+SUBROUTINE fillNodeTypes()
+!===================================================================================================================================
+!
+!===================================================================================================================================
+! MODULES
+USE MOD_Mesh_Vars   ,ONLY: N
+USE MOD_basis_Vars  ,ONLY: RefNodeXi,Vdm_AtoB
+USE MOD_Basis1D     ,ONLY: LegGaussLobNodesAndWeights,BarycentricWeights,InitializeVandermonde
+! IMPLICIT VARIABLE HANDLING
+IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! OUTPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES 
+INTEGER                          :: i
+REAL,DIMENSION(0:N,0:1)          :: wBary
+!===================================================================================================================================
+ALLOCATE(refNodeXi(0:N,0:1),Vdm_AtoB(0:N,0:N,0:1,0:1))
+!fill first with identity
+Vdm_AtoB=0.
+DO i=0,N
+  Vdm_AtoB(i,i,:,:)=1.
+END DO
+!prepare EQ to GL tranform
+!nodeType=0: Equidistant
+DO i=0,N
+  RefNodeXi(i,0)=REAL(i)
+END DO
+RefNodeXi(:,0)=(2./REAL(N))*RefNodeXi(:,0) -1.
+CALL LegGaussLobNodesAndWeights(N,refNodeXi(:,1))
+CALL BarycentricWeights(N,RefNodeXi(:,0),wBary(:,0))
+CALL BarycentricWeights(N,RefNodeXi(:,1),wBary(:,1))
+CALL InitializeVandermonde(N,N,wBary(:,0),RefNodeXi(:,0),RefNodeXi(:,1),Vdm_AtoB(:,:,0,1))
+CALL InitializeVandermonde(N,N,wBary(:,1),RefNodeXi(:,1),RefNodeXi(:,0),Vdm_AtoB(:,:,1,0))
+
+END SUBROUTINE FillNodeTypes
+
 
 
 SUBROUTINE fillBasisMapping()

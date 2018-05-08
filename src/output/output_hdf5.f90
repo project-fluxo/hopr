@@ -59,9 +59,10 @@ SUBROUTINE WriteMeshToHDF5(FileString)
 USE MOD_Mesh_Vars,ONLY:tElem,tSide
 USE MOD_Mesh_Vars,ONLY:FirstElem
 USE MOD_Mesh_Vars,ONLY:N
-USE MOD_Output_Vars,ONLY:dosortIJK
+USE MOD_Output_Vars,ONLY:dosortIJK,OutputNodeType,OutputNodeTypeStr
 USE MOD_Mesh_Vars,ONLY:nUserDefinedBoundaries,BoundaryName,BoundaryType
 USE MOD_Mesh_Basis,ONLY:ISORIENTED
+USE MOD_Basis_Vars,ONLY:RefNodeXi,CurrentNodeType
 USE MOD_MHDEQ_Vars,ONLY:useMHDEQ,MHDEQvarNames,nVarMHDEQ,MHDEQoutdataGL
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
@@ -296,6 +297,16 @@ DEALLOCATE(ElemInfo)
 CALL WriteArrayToHDF5(File_ID,'SideInfo',2,(/SideInfoSize,nSides/),IntegerArray=SideInfo)
 DEALLOCATE(SideInfo)
 
+IF(nNodes.EQ.(N+1)**3*nElems)THEN !only for pure hexa grids!
+  CALL InterpolateToOutputNodeType(NodeCoords)
+ELSE
+  IF(currentNodeType.NE.0) STOP 'non-hexa mesh needs to be on equidistant reference points'
+  OutputNodeTypeStr='EQUIDISTANT'
+  OutputNodeType=0
+END IF
+
+CALL WriteAttribute(File_ID,'OutputNodeType',1,StrArray=(/OutputNodeTypeStr/))
+CALL WriteAttribute(File_ID,'OutputNodeXi',N+1,RealArray=RefNodeXi(:,OutputNodeType))
 ! WRITE NodeCoords and NodeIDs
 CALL WriteArrayToHDF5(File_ID,'NodeCoords',2,(/3,nNodes/),RealArray=NodeCoords)
 CALL WriteArrayToHDF5(File_ID,'GlobalNodeIDs',1,(/nNodes/),IntegerArray=GlobalNodeIDs)
@@ -388,6 +399,28 @@ CALL Timer(.FALSE.)
 
 END SUBROUTINE WriteMeshToHDF5
 
+SUBROUTINE InterpolateToOutputNodeType(xcoords)
+!===================================================================================================================================
+! interpolate node coords  
+!===================================================================================================================================
+! MODULES
+USE MOD_ChangeBasis,ONLY:ChangeBasis3D
+USE MOD_Mesh_Vars,ONLY:N,nMeshElems
+USE MOD_Basis_Vars,ONLY:CurrentNodeType,RefNodeXi,Vdm_AtoB
+USE MOD_Output_Vars,ONLY:OutputNodeType
+IMPLICIT NONE
+!-----------------------------------------------------------------------------------------------------------------------------------
+! INPUT VARIABLES
+REAL,INTENT(INOUT):: xcoords(3,0:N,0:N,0:N,nElems) !reshapes NodeCoords on input/output
+!-----------------------------------------------------------------------------------------------------------------------------------
+! OUTPUT VARIABLES
+!-----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+!===================================================================================================================================
+IF((OutputNodeType.NE.CurrentNodeType).AND.(N.GT.2))THEN  !0: equidistant,1:GL
+  CALL ChangeBasis3D(3,nMeshElems,N,N,Vdm_AtoB(:,:,CurrentNodeType,OutputNodeType),xcoords,xcoords,.FALSE.) 
+END IF
+END SUBROUTINE interpolateToOutputNodeType
 
 SUBROUTINE getMeshInfo()
 !===================================================================================================================================

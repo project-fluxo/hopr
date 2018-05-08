@@ -41,6 +41,8 @@ INTEGER                     :: outputFormat               !=0: VTK, =1 tecplot a
 CHARACTER(LEN=255)          :: sfc_type                   ! morton or hilbert
 INTEGER                     :: sfc_boundbox               ! Type of bounding box =1: tight for each direction (anisotrop cart. boxes)
                                                           ! =2 bound. box is the max. cube (for isotropic elem size / unstr. meshes)
+INTEGER                     :: OutputNodeType
+CHARACTER(LEN=255)          :: OutputNodeTypeStr
 LOGICAL                     :: doSortIJK
 LOGICAL                     :: useSpaceFillingCurve
 LOGICAL                     :: OutputInitDone

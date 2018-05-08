@@ -52,12 +52,11 @@ SUBROUTINE PostDeform()
 USE MOD_Globals
 USE MOD_Mesh_Vars   ,ONLY: tElem,Elems,MeshPostDeform,PostDeform_useGL
 USE MOD_Mesh_Vars   ,ONLY: N,nMeshElems
-USE MOD_Basis_Vars  ,ONLY: HexaMap
-USE MOD_Basis1D     ,ONLY: LegGaussLobNodesAndWeights,BarycentricWeights,InitializeVandermonde
+USE MOD_Basis_Vars  ,ONLY: HexaMap,Vdm_AtoB,CurrentNodeType
 USE MOD_ChangeBasis ,ONLY: ChangeBasis3D
 USE MOD_MHDEQ_Vars  ,ONLY: whichEquilibrium,nVarMHDEQ,MHDEQoutdataGL,MHDEQdataEq
 USE MOD_MHDEQ       ,ONLY: MapToMHDEQ
-USE MOD_Output_vars ,ONLY:DebugVisu,DebugVisuLevel
+USE MOD_Output_vars ,ONLY:DebugVisu,DebugVisuLevel,OutputNodeType
 !MODULE OUTPUT VARIABLES
 ! MODULES
 ! IMPLICIT VARIABLE HANDLING
@@ -73,9 +72,7 @@ IMPLICIT NONE
 TYPE(tElem),POINTER          :: aElem   
 INTEGER                      :: iNode   
 INTEGER                      :: nTotal 
-INTEGER                      :: i,iElem,ijk(3)
-REAL,DIMENSION(0:N)          :: xi_EQ,xi_GL,wBary_EQ,wBary_GL
-REAL,DIMENSION(0:N,0:N)      :: Vdm_EQtoGL, Vdm_GLtoEQ
+INTEGER                      :: iElem,ijk(3)
 REAL                         :: xElem(3,0:N,0:N,0:N,nMeshElems)
 INTEGER                      :: HexaMapN1(8,3)
 !===================================================================================================================================
@@ -89,17 +86,6 @@ IF(N.EQ.1)THEN
   HexaMapN1(:,2)=(/0,0,1,1,0,0,1,1/)
   HexaMapN1(:,3)=(/0,0,0,0,1,1,1,1/)
 END IF !N=1
-
-!prepare EQ to GL tranform
-CALL LegGaussLobNodesAndWeights(N,xi_GL)
-DO i=0,N
-  xi_EQ(i)=REAL(i)
-END DO
-xi_EQ(:)=(2./REAL(N))*xi_EQ(:) -1.
-CALL BarycentricWeights(N,xi_EQ,wBary_EQ)
-CALL BarycentricWeights(N,xi_GL,wBary_GL)
-CALL InitializeVandermonde(N,N,wBary_EQ,xi_EQ,xi_GL,Vdm_EQtoGL)
-CALL InitializeVandermonde(N,N,wBary_GL,xi_GL,xi_EQ,Vdm_GLtoEQ)
 
 xElem=0.
 !Copy Equidist. element nodes
@@ -122,7 +108,7 @@ END DO ! iElem
 
 !transform Equidist. to Gauss-Lobatto points
 IF((PostDeform_useGL).AND.(N.GT.2))THEN
-  CALL ChangeBasis3D(3,nMeshElems,N,N,Vdm_EQtoGL,xElem,xElem,.FALSE.)
+  CALL ChangeBasis3D(3,nMeshElems,N,N,Vdm_AtoB(:,:,0,1),xElem,xElem,.FALSE.) !Eq->GL
 END IF !PostDeform_useGL
 
 !transform (all nodes are marked from -2 to -1)
@@ -138,15 +124,19 @@ IF(whichEquilibrium.GT.0)THEN
     !data is already on GL poitns 
     MHDEQoutdataGL=MHDEQdataEq
     !change back to equidistant for visu output
-    CALL ChangeBasis3D(nVarMHDEQ,nMeshElems,N,N,Vdm_GLtoEQ,MHDEQdataEq,MHDEQdataEq,.FALSE.)
+    CALL ChangeBasis3D(nVarMHDEQ,nMeshElems,N,N,Vdm_AtoB(:,:,1,0),MHDEQdataEq,MHDEQdataEq,.FALSE.) !GL->EQ
   ELSE
-    CALL ChangeBasis3D(nVarMHDEQ,nMeshElems,N,N,Vdm_EQtoGL,MHDEQdataEq,MHDEQoutdataGL,.FALSE.)
+    CALL ChangeBasis3D(nVarMHDEQ,nMeshElems,N,N,Vdm_AtoB(:,:,1,0),MHDEQdataEq,MHDEQoutdataGL,.FALSE.)
   END IF!postDeform_useGL
 END IF
 
 IF((PostDeform_useGL).AND.(N.GT.2))THEN
+  IF(outputNodeType.EQ.1)THEN
+    currentNodeType=1  !keep GL points until output
+  ELSE
   !transform back from GL to EQ
-  CALL ChangeBasis3D(3,nMeshElems,N,N,Vdm_GLtoEQ,xElem,xElem,.FALSE.)
+    CALL ChangeBasis3D(3,nMeshElems,N,N,Vdm_AtoB(:,:,1,0),xElem,xElem,.FALSE.)
+  END IF
 END IF
   
 ! copy back (all nodes are marked from -1 to 0)

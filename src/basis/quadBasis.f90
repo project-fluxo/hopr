@@ -45,7 +45,7 @@ PUBLIC::getQuadBasis,getBasisMappingQuad
 !===================================================================================================================================
 
 CONTAINS
-SUBROUTINE getQuadBasis(Deg,nNodes1D,Vdm_visu,D_visu)
+SUBROUTINE getQuadBasis(Deg,nNodes1D,r1D,Vdm_visu,D_visu)
 !===================================================================================================================================
 ! given the degree of the orthogonal basis and the number of 1D nodes, equidistant nodes in the tetrahedron are generated and 
 ! we compute the Vadndermonde matrix and the Vandermondematrix of the gradient of the basis function
@@ -58,6 +58,7 @@ IMPLICIT NONE
 ! INPUT VARIABLES
 INTEGER, INTENT(IN) :: Deg  ! ?
 INTEGER, INTENT(IN) :: nNodes1D  ! ?
+REAL,    INTENT(IN) :: r1D(0:deg)
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
 REAL,ALLOCATABLE,INTENT(OUT)        :: Vdm_visu(:,:)  ! ?
@@ -65,37 +66,30 @@ REAL,ALLOCATABLE,INTENT(OUT)        :: D_visu(:,:,:)  ! ?
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES 
 REAL,ALLOCATABLE        :: VdmInv(:,:)  ! ?
-REAL,ALLOCATABLE        :: r1D(:)            ! equidistant 1D Lobatto nodes in [-1,1]
 INTEGER,ALLOCATABLE     :: bMap(:,:)         ! basis mapping iAns=>i,j,k
 INTEGER,ALLOCATABLE     :: nodeMap(:,:)      ! mapping for equidistant nodes iNode=>i,j,k
+REAL                    :: r1Dvisu(0:nNodes1D-1)    ! equidistant 1D Lobatto nodes in [-1,1]
 INTEGER                 :: nNodes  ! ?
 INTEGER                 :: nAns  ! ?
 INTEGER                 :: i    ! ?
 !===================================================================================================================================
 !nodal Vandermonde
-ALLOCATE(r1D(0:Deg))
-!equidistant nodes
-DO i=0,Deg
-  r1D(i)=-1.+2.*REAL(i)/REAL(Deg)
-END DO
 CALL getBasisMappingQuad(Deg,nAns,bMap)
 nNodes=nAns
 ALLOCATE(VdmInv(nNodes,nAns))
 CALL VandermondeQuad(Deg+1,Deg,bMap,bMap,r1D,VdmInv)
 VdmInv=GetInverse(nAns,VdmInv)
-DEALLOCATE(r1D)
 
 !visualization
-ALLOCATE(r1D(0:nNodes1D-1))
 !equidistant nodes
 DO i=0,nNodes1D-1
-  r1D(i)=-1.+2.*REAL(i)/REAL(nNodes1D-1)
+  r1Dvisu(i)=-1.+2.*REAL(i)/REAL(nNodes1D-1)
 END DO
 CALL getBasisMappingQuad(nNodes1D-1,nNodes,nodeMap)
 ALLOCATE(Vdm_visu(nNodes,nAns),D_visu(nNodes,nAns,2))
 
-CALL VandermondeQuad(nNodes1D,Deg,nodeMap,bMap,r1D,VdM_visu)
-CALL GradVandermondeQuad(nNodes1D,Deg,nodeMap,bMap,r1D,D_visu)
+CALL VandermondeQuad(nNodes1D,Deg,nodeMap,bMap,r1Dvisu,VdM_visu)
+CALL GradVandermondeQuad(nNodes1D,Deg,nodeMap,bMap,r1Dvisu,D_visu)
 
 Vdm_visu=MATMUL(Vdm_visu,VdmInv)
 D_visu(:,:,1)=MATMUL(D_visu(:,:,1),VdmInv)

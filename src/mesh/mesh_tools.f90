@@ -331,6 +331,7 @@ USE MOD_Mesh_Vars ,ONLY:N
 USE MOD_Basis_Vars,ONLY:nVisu
 USE MOD_Basis_Vars,ONLY:Vdm_Visu_tria,D_Visu_tria
 USE MOD_Basis_Vars,ONLY:Vdm_Visu_quad,D_Visu_quad
+USE MOD_Basis_Vars,ONLY:Vdm_Visu_GLquad,D_Visu_GLquad,currentNodeType
 USE MOD_Basis_Vars,ONLY:VisuTriaMapInv,VisuQuadMapInv
 USE MOD_Mesh_Vars ,ONLY:tElem,tSide
 USE MOD_Mesh_Vars ,ONLY:FirstElem
@@ -352,6 +353,7 @@ CHARACTER(LEN=255)              :: FileString  ! ?
 CHARACTER(LEN=255),ALLOCATABLE  :: VarNames(:)  ! ?
 REAL,ALLOCATABLE                :: xNode(:,:),x(:,:),xt1(:,:),xt2(:,:)  ! ?
 REAL,ALLOCATABLE                :: Coord(:,:,:),Values(:,:,:)   ! ?
+REAL,POINTER                    :: D_visQuad(:,:,:),Vdm_visQuad(:,:)   ! ?
 REAL                            :: normal(3)  ! ?
 !===================================================================================================================================
 WRITE(UNIT_stdOut,'(132("~"))')
@@ -376,6 +378,14 @@ IF(nCurveds.EQ.0)THEN
   RETURN
 ELSE
   WRITE(UNIT_stdOut,'(A,I8)')'   #CurvedSurfaces: ', nCurveds
+END IF
+
+IF(currentNodeType.EQ.1)THEN
+  Vdm_visQuad=>Vdm_visu_GLQuad
+  D_visQuad  =>D_visu_GLQuad
+ELSE
+  Vdm_visQuad=>Vdm_visu_Quad
+  D_visQuad  =>D_visu_Quad
 END IF
 
 FileString=TRIM(ProjectName)//'_'//'SplineSurf'
@@ -434,9 +444,9 @@ DO WHILE(ASSOCIATED(Elem))
           END DO
         END DO
       CASE(4)
-        x  = MATMUL(Vdm_Visu_quad,xNode(1:nNodes,:))
-        xt1= MATMUL(D_Visu_quad(:,:,1),xNode(1:nNodes,:))
-        xt2= MATMUL(D_Visu_quad(:,:,2),xNode(1:nNodes,:))
+        x  = MATMUL(Vdm_VisQuad,xNode(1:nNodes,:))
+        xt1= MATMUL(D_VisQuad(:,:,1),xNode(1:nNodes,:))
+        xt2= MATMUL(D_VisQuad(:,:,2),xNode(1:nNodes,:))
         DO j=0,Nplot
           DO i=0,Nplot
             l=VisuQuadMapInv(i,j)
@@ -470,7 +480,7 @@ USE MOD_Globals
 USE MOD_Mesh_Vars ,ONLY:tElem
 USE MOD_Mesh_Vars ,ONLY:FirstElem
 USE MOD_Mesh_Vars ,ONLY:N
-USE MOD_Basis_Vars,ONLY:Vdm_Visu_Hexa,D_Visu_Hexa
+USE MOD_Basis_Vars,ONLY:Vdm_Visu_Hexa,D_Visu_Hexa,Vdm_Visu_GLHexa,D_Visu_GLHexa,currentNodeType
 USE MOD_Basis_Vars,ONLY:VisuHexaMapInv,HexaMap
 USE MOD_Basis_Vars,ONLY:nVisu
 USE MOD_Output    ,ONLY:Visualize
@@ -493,6 +503,7 @@ CHARACTER(LEN=255),ALLOCATABLE  :: VarNames(:)  ! ?
 REAL,ALLOCATABLE                :: xNode(:,:),x(:,:),xt1(:,:),xt2(:,:),xt3(:,:),Jac(:)  ! ?
 REAL,ALLOCATABLE                :: MHDEQdataNode(:,:)
 REAL,ALLOCATABLE                :: Coord(:,:,:),Values(:,:,:)   ! ?
+REAL,POINTER                    :: D_visHex(:,:,:),Vdm_visHex(:,:)   ! ?
 REAL                            :: smaxJac  ! ?
 INTEGER,ALLOCATABLE             :: ElemMap(:),ElemMapInv(:)  ! for visu_sJ_limit
 !===================================================================================================================================
@@ -518,6 +529,14 @@ END IF
 
 
 FileString=TRIM(ProjectName)//'_'//'SplineVol'
+
+IF(currentNodeType.EQ.1)THEN
+  Vdm_visHex=>Vdm_visu_GLHexa
+  D_visHex  =>D_visu_GLHexa
+ELSE
+  Vdm_visHex=>Vdm_visu_Hexa
+  D_visHex  =>D_visu_Hexa
+END IF
 
 Nplot=nVisu !number of equidistant points for visualization mesh
 Nplot_p1=Nplot+1
@@ -568,10 +587,10 @@ DO WHILE(ASSOCIATED(Elem))
            'Curved node array has not the right size.',999,999.) ! check required due to intel compiler error (02)
         END IF
       END DO
-      x  = MATMUL(Vdm_Visu_Hexa,xNode(1:nNodes,:))
-      xt1= MATMUL(D_Visu_Hexa(:,:,1),xNode(1:nNodes,:))
-      xt2= MATMUL(D_Visu_Hexa(:,:,2),xNode(1:nNodes,:))
-      xt3= MATMUL(D_Visu_Hexa(:,:,3),xNode(1:nNodes,:))
+      x  = MATMUL(Vdm_visHex,xNode(1:nNodes,:))
+      xt1= MATMUL(D_VisHex(:,:,1),xNode(1:nNodes,:))
+      xt2= MATMUL(D_VisHex(:,:,2),xNode(1:nNodes,:))
+      xt3= MATMUL(D_VisHex(:,:,3),xNode(1:nNodes,:))
       DO iNode=1,Nplot_p1_3
         Jac(iNode)=SUM(xt1(iNode,:)*CROSS(xt2(iNode,:),xt3(iNode,:)))
       END DO
@@ -588,7 +607,7 @@ DO WHILE(ASSOCIATED(Elem))
       END DO
       Values(1,:,iElem)=Elem%ind
       Values(4,:,iElem)=MINVAL(Values(3,:,iElem))
-      IF(useMHDEQ) Values(5:4+nVarMHDEQ,:,iElem)  = TRANSPOSE(MATMUL(Vdm_Visu_Hexa,MHDEQDataNode(1:nNodes,:)))
+      IF(useMHDEQ) Values(5:4+nVarMHDEQ,:,iElem)  = TRANSPOSE(MATMUL(Vdm_VisHex,MHDEQDataNode(1:nNodes,:)))
     END SELECT
   END IF
   Elem=>Elem%nextElem

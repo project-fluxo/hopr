@@ -147,15 +147,7 @@ SUBROUTINE fillBasisMapping()
 ! iAns=1: 1, iAns=2: x, iAns=3: y
 !===================================================================================================================================
 ! MODULES
-USE MOD_Basis_Vars,ONLY:nVisu
-USE MOD_Basis_Vars,ONLY:TriaMap,TriaMapInv,VisuTriaMap,VisuTriaMapInv,Vdm_visu_Tria,D_visu_Tria
-USE MOD_Basis_Vars,ONLY:QuadMap,QuadMapInv,VisuQuadMap,VisuQuadMapInv,Vdm_visu_Quad,D_visu_Quad
-USE MOD_Basis_Vars,ONLY:TetraMap,TetraMapInv !,Vdm_visu_Tetra,D_visu_Tetra
-USE MOD_Basis_Vars,ONLY:PyraMap,PyraMapInv   !,Vdm_visu_Pyra,D_visu_Pyra
-USE MOD_Basis_Vars,ONLY:PrismMap,PrismMapInv !,Vdm_visu_Prism,D_visu_Prism
-USE MOD_Basis_Vars,ONLY:HexaMap,HexaMapInv,Vdm_visu_Hexa,D_visu_Hexa,VisuHexaMap,VisuHexaMapInv
-USE MOD_Basis_Vars,ONLY:MapSideToVol
-USE MOD_Basis_Vars,ONLY:EdgeToTria,EdgeToQuad
+USE MOD_Basis_Vars
 USE MOD_Mesh_Vars,ONLY:N
 USE MOD_QuadBasis
 USE MOD_TriaBasis
@@ -172,6 +164,7 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES 
 INTEGER             :: i,j,p,q,nNodes   ! ?
+REAL                :: r1D(0:N)
 !===================================================================================================================================
 
 ! Build mappings for each element type
@@ -187,11 +180,20 @@ CALL getBasisMappingQuad(nVisu,nNodes,VisuQuadMap,VisuQuadMapInv)
 CALL getBasisMappingHexa(N,nNodes,HexaMap,HexaMapInv)
 CALL getBasisMappingHexa(nVisu,nNodes,VisuHexaMap,VisuHexaMapInv)
 
+!equidistant nodes of the mapping
+DO i=0,N
+  r1D(i)=-1.+2.*REAL(i)/REAL(N)
+END DO
 ! get Vandermonde and D matrices for visualization
 CALL getTriaBasis(N,nVisu+1,Vdm_visu_Tria,D_visu_Tria)
-CALL getQuadBasis(N,nVisu+1,Vdm_visu_Quad,D_visu_Quad)
+CALL getQuadBasis(N,nVisu+1,r1D,Vdm_visu_Quad,D_visu_Quad)
 !CALL getTetraBasis(N,nVisu+1,Vdm_visu_Tetra,D_visu_Tetra)
-CALL getHexaBasis(N,nVisu+1,Vdm_visu_Hexa,D_visu_Hexa)
+CALL getHexaBasis(N,nVisu+1,r1D,Vdm_visu_Hexa,D_visu_Hexa)
+
+!GL
+CALL GetNodesAndWeights(N,'GAUSS-LOBATTO',r1D)
+CALL getQuadBasis(N,nVisu+1,r1D,Vdm_visu_GLQuad,D_visu_GLQuad)
+CALL getHexaBasis(N,nVisu+1,r1D,Vdm_visu_GLHexa,D_visu_GLHexa)
 
 ! map edges of triangle surface counterclockwise points to BoundaBasisMappingInv(i,j)
 ALLOCATE(EdgeToTria(3,N+1))

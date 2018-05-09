@@ -46,7 +46,7 @@ PUBLIC::getHexaBasis,getBasisMappingHexa
 !===================================================================================================================================
 
 CONTAINS
-SUBROUTINE getHexaBasis(Deg,nNodes1D,Vdm_visu,D_visu)
+SUBROUTINE getHexaBasis(Deg,nNodes1D,r1D,Vdm_visu,D_visu)
 !===================================================================================================================================
 ! given the degree of the orthogonal basis and the number of 1D nodes, equidistant nodes in the tetrahedron are generated and 
 ! we compute the Vadndermonde matrix and the Vandermondematrix of the gradient of the basis function
@@ -59,6 +59,7 @@ IMPLICIT NONE
 ! INPUT VARIABLES
 INTEGER, INTENT(IN) :: Deg  ! ?
 INTEGER, INTENT(IN) :: nNodes1D  ! ?
+REAL,    INTENT(IN) :: r1D(0:deg)
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
 REAL,ALLOCATABLE,INTENT(OUT)        :: Vdm_visu(:,:) ! ?
@@ -66,23 +67,17 @@ REAL,ALLOCATABLE,INTENT(OUT)        :: D_visu(:,:,:)  ! ?
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES 
 REAL,ALLOCATABLE        :: Vdm1D(:,:),D0(:,:),D_1D(:,:)  ! ?
-REAL,ALLOCATABLE        :: r1D(:),wBary(:)    ! equidistant 1D Lobatto nodes in [-1,1]
-REAL,ALLOCATABLE        :: r1Dvisu(:)    ! equidistant 1D Lobatto nodes in [-1,1]
 INTEGER,ALLOCATABLE     :: bMap(:,:)         ! basis mapping iAns=>i,j,k
 INTEGER,ALLOCATABLE     :: nodeMap(:,:)      ! mapping for equidistant nodes iNode=>i,j,k
+REAL                    :: wBary(0:deg)    ! equidistant 1D Lobatto nodes in [-1,1]
+REAL                    :: r1Dvisu(0:nNodes1D-1)    ! equidistant 1D Lobatto nodes in [-1,1]
 INTEGER                 :: nNodes  ! ?
 INTEGER                 :: nAns  ! ?
 INTEGER                 :: i  ! ?
 !===================================================================================================================================
-ALLOCATE(r1D(0:Deg),wBary(0:Deg))
-!equidistant nodes of the mapping
-DO i=0,Deg
-  r1D(i)=-1.+2.*REAL(i)/REAL(Deg)
-END DO
 CALL BarycentricWeights(Deg,r1D,wBary)
 
 !visualization
-ALLOCATE(r1Dvisu(0:nNodes1D-1))
 !equidistant nodes for output
 DO i=0,nNodes1D-1
   r1Dvisu(i)=-1.+2.*REAL(i)/REAL(nNodes1D-1)

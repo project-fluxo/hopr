@@ -187,6 +187,7 @@ CONTAINS
 
   FUNCTION EvalJac(Xgeo_in) RESULT(Jac_out)
     USE MOD_ChangeBasis,ONLY:ChangeBasis3D
+    USE MOD_Basis_Vars,ONLY:CurrentNodeType
     !uses N,nAnalyze, VdmGLToAP and D_EqToGL from main routine
     IMPLICIT NONE
     !-------------------------------------------------------------
@@ -206,13 +207,26 @@ CONTAINS
     dXdxiGL  =0.
     dXdetaGL =0.
     dXdzetaGL=0.
-    DO k=0,N; DO j=0,N; DO i=0,N
-      DO l=0,N
-        dXdxiGL  (:,i,j,k) = dXdxiGL  (:,i,j,k) + D_EqToGL(i,l)*Xgeo_in(:,l,j,k)
-        dXdetaGL (:,i,j,k) = dXdetaGL (:,i,j,k) + D_EqToGL(j,l)*Xgeo_in(:,i,l,k)
-        dXdzetaGL(:,i,j,k) = dXdzetaGL(:,i,j,k) + D_EqToGL(k,l)*Xgeo_in(:,i,j,l)
-      END DO !l=0,N
-    END DO; END DO; END DO !i,j,k=0,N
+    IF(currentNodeType.EQ.0)THEN
+      DO k=0,N; DO j=0,N; DO i=0,N
+        DO l=0,N
+          dXdxiGL  (:,i,j,k) = dXdxiGL  (:,i,j,k) + D_EqToGL(i,l)*Xgeo_in(:,l,j,k)
+          dXdetaGL (:,i,j,k) = dXdetaGL (:,i,j,k) + D_EqToGL(j,l)*Xgeo_in(:,i,l,k)
+          dXdzetaGL(:,i,j,k) = dXdzetaGL(:,i,j,k) + D_EqToGL(k,l)*Xgeo_in(:,i,j,l)
+        END DO !l=0,N
+      END DO; END DO; END DO !i,j,k=0,N
+    ELSEIF(currentNodeType.EQ.1)THEN
+      DO k=0,N; DO j=0,N; DO i=0,N
+        DO l=0,N
+          dXdxiGL  (:,i,j,k) = dXdxiGL  (:,i,j,k) + DGL(i,l)*Xgeo_in(:,l,j,k)
+          dXdetaGL (:,i,j,k) = dXdetaGL (:,i,j,k) + DGL(j,l)*Xgeo_in(:,i,l,k)
+          dXdzetaGL(:,i,j,k) = dXdzetaGL(:,i,j,k) + DGL(k,l)*Xgeo_in(:,i,j,l)
+        END DO !l=0,N
+      END DO; END DO; END DO !i,j,k=0,N
+    ELSE
+      STOP 'no other current node type allowed in EvalJac'
+    END IF
+
     CALL ChangeBasis3D(3,N,nAnalyze,VdmGLToAP,dXdxiGL  ,dXdxiAP  )
     CALL ChangeBasis3D(3,N,nAnalyze,VdmGLToAP,dXdetaGL ,dXdetaAP )
     CALL ChangeBasis3D(3,N,nAnalyze,VdmGLToAP,dXdzetaGL,dXdzetaAP)

@@ -21,7 +21,7 @@
 ! You should have received a copy of the GNU General Public License along with HOPR. If not, see <http://www.gnu.org/licenses/>.
 !=================================================================================================================================
 #include "hopr.h"
-MODULE MOD_MHDEQ
+MODULE MOD_GVEC
 !===================================================================================================================================
 ! ?
 !===================================================================================================================================
@@ -35,36 +35,36 @@ PRIVATE
 ! Private Part ---------------------------------------------------------------------------------------------------------------------
 ! Public Part ----------------------------------------------------------------------------------------------------------------------
 
-INTERFACE InitMHDEQ 
-  MODULE PROCEDURE InitMHDEQ
+INTERFACE InitGVEC 
+  MODULE PROCEDURE InitGVEC 
 END INTERFACE
 
 ! allow different dimensions of input/output arrays
-!INTERFACE MapToMHDEQ
-!  MODULE PROCEDURE MapToMHDEQ
+!INTERFACE MapToGVEC 
+!  MODULE PROCEDURE MapToGVEC 
 !END INTERFACE
 
-INTERFACE FinalizeMHDEQ 
-  MODULE PROCEDURE FinalizeMHDEQ
+INTERFACE FinalizeGVEC 
+  MODULE PROCEDURE FinalizeGVEC 
 END INTERFACE
 
-PUBLIC::InitMHDEQ
-PUBLIC::MapToMHDEQ
-PUBLIC::FinalizeMHDEQ
+PUBLIC::InitGVEC
+PUBLIC::MapToGVEC
+PUBLIC::FinalizeGVEC
 !===================================================================================================================================
 
 CONTAINS
-SUBROUTINE InitMHDEQ 
+SUBROUTINE InitGVEC 
 !===================================================================================================================================
 ! ?
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals,ONLY:UNIT_stdOut,abort
-USE MOD_ReadInTools,ONLY:GETINT,GETREALARRAY
-USE MOD_MHDEQ_Vars
-USE MOD_VMEC, ONLY:InitVMEC
-USE MOD_GVEC, ONLY:InitGVEC
-USE MOD_Solov, ONLY:InitSolov
+USE MOD_ReadInTools
+USE MOD_GVEC_Vars
+#ifdef PP_GVEC
+USE MODgvec_EVAL_GVEC, ONLY: InitEval_GVEC
+#endif /*PP_GVEC*/
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -76,111 +76,152 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
 !===================================================================================================================================
-WRITE(UNIT_stdOut,'(A)')'INIT MHD EQUILIBRIUM INPUT ...'
-whichEquilibrium    = GETINT('whichEquilibrium','0')   
-IF(WhichEquilibrium.EQ.0) THEN 
-  WRITE(UNIT_stdOut,'(A)')'... NOTHING TO BE DONE'
-  RETURN
-END IF
-SELECT CASE(whichEquilibrium)
-CASE(1)
-  useMHDEQ=.TRUE.
-  WRITE(*,*)'Using VMEC as equilibrium solution...'
-  CALL InitVMEC()
-CASE(2)
-  useMHDEQ=.TRUE.
-  WRITE(*,*)'Using Soloviev as equilibrium solution...'
-  CALL InitSolov()
-CASE(3)
-  useMHDEQ=.TRUE.
-  WRITE(*,*)'Using GVEC as equilibrium solution...'
-  CALL InitGVEC()
-CASE DEFAULT
-  WRITE(*,*)'WARNING: No Equilibrium solution for which Equilibrium= ', whichEquilibrium
-  STOP
-END SELECT
-  !density coefficients of the polynomial coefficients: rho_1+rho_2*x + rho_3*x^2 ...
-  nRhoCoefs=GETINT("nRhoCoefs","0")
-  IF(nRhoCoefs.GT.0)THEN
-    RhoFluxVar=GETINT("RhoFluxVar") ! dependant variable: =0: psinorm (tor. flux), =1:chinorm (pol. flux)
-    ALLOCATE(RhoCoefs(nRhoCoefs))
-    RhoCoefs=GETREALARRAY("RhoCoefs",nRhoCoefs)
-  END IF
-  InputCoordSys=GETINT("MHDEQ_inputCoordSys","0")
-  ! =0: x_in(1:3) are (x,y,z) coordinates in a cylinder of size r=[0;1], z=[0;1]
-  ! =1: x_in(1:3) are (r,zeta,theta) coordinates r= [0;1], zeta= [0;1], theta=[0;1]
+WRITE(UNIT_stdOut,'(A)')'  INIT GVEC INPUT ...'
 
-WRITE(UNIT_stdOut,'(A)')'... DONE'
-END SUBROUTINE InitMHDEQ
+GVECdataFile=GETSTR("GVECwoutfile")
 
+#ifdef PP_GVEC
+CALL InitEval_GVEC(GVECdataFile)
+#else
+STOP 'HOPR NOT COMPILED WITH GVEC!!!'
+#endif /*PP_GVEC*/
 
-SUBROUTINE MapToMHDEQ(nTotal,x_in,x_out,MHDEQdata)
+WRITE(UNIT_stdOut,'(A)')'  ... DONE'
+END SUBROUTINE InitGVEC
+
+SUBROUTINE MapToGVEC(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 !===================================================================================================================================
-! Maps a cylinder (r,z,phi) to a toroidal closed flux surface configuration derived from VMEC data. 
+! Maps a cylinder (r,z,phi) to a toroidal closed flux surface configuration derived from GVEC data. 
 ! Surfaces with constant r become flux surfaces. z [0;1] is mapped to [0;2*pi] 
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
-USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,whichEquilibrium,InputCoordSys
-USE MOD_VMEC, ONLY:MapToVMEC
-USE MOD_GVEC, ONLY:MapToGVEC
-USE MOD_Solov, ONLY:MapToSolov
+USE MOD_MHDEQ_Vars,    ONLY: nVarMHDEQ
+USE MOD_MHDEQ_Vars,    ONLY: nRhoCoefs,RhoFluxVar,RhoCoefs
+USE MOD_MHDEQ_Tools,   ONLY: Eval1DPoly
+USE MOD_GVEC_Vars,     ONLY: wp,twoPi,mu0,GVECdatafile
+#ifdef PP_GVEC
+USE MODgvec_Eval_GVEC , ONLY: Eval_GVEC
+#endif
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! INPUT VARIABLES
-INTEGER,INTENT(IN) :: nTotal         ! total number of points
-REAL, INTENT(IN)   :: x_in(3,nTotal) ! input coordinates represent a cylinder: 
+INTEGER,INTENT(IN) :: nTotal          !! total number of points
+REAL(wp),INTENT(IN):: x_in(3,nTotal)  !! input coordinates represent a cylinder: 
+INTEGER, INTENT(IN):: InputCoordSys   !!  0: x_in(1:3) are (x,y,z) coordinates in a cylinder of size r=[0;1], z=[0;1]
+                                      !! 1: x_in(1:3) are (r,z,phi) coordinates r= [0;1], z= [0;1], phi=[0;1]
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
-REAL,INTENT(OUT)   :: x_out(3,nTotal) ! mapped x,y,z coordinates with vmec data
-REAL,INTENT(OUT)   :: MHDEQdata(nVarMHDEQ,nTotal) 
+REAL(wp),INTENT(OUT):: x_out(3,nTotal) !! mapped x,y,z coordinates with GVEC data
+REAL(wp),INTENT(OUT):: MHDEQdata(nVarMHDEQ,nTotal) !! vector of equilibrium variables, see definition in mhdeq_vars.f90
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+INTEGER :: iNode,percent,minnode,maxnode,istep,nsteps,nnodes
+REAL(wp) :: r_p, theta,zeta,phi_int,chi_int,phi_edge_axis(2),chi_edge_axis(2),Density,phinorm,chinorm
+REAL(wp) :: xin2(3,nTotal)
 !===================================================================================================================================
-SELECT CASE(whichEquilibrium)
-CASE(1)
-  CALL MapToVMEC(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
-CASE(2)
-  CALL MapToSolov(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
-CASE(3)
-  CALL MapToGVEC(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
-END SELECT
-END SUBROUTINE MapToMHDEQ 
+WRITE(UNIT_stdOut,'(A,I8,A,A,A)')'  MAP ', nTotal,' NODES TO GVEC DATA FROM ',TRIM(GVECdataFile),' ...'
+percent=0
+nnodes=nTotal/100
+nsteps=nTotal/nNodes+1
+DO istep=0,nsteps-1
+!DO iNode=1,nTotal
+  ! output of progress in %
+!  IF((nTotal.GT.10000).AND.(MOD(iNode,(nTotal/100)).EQ.0)) THEN
+  IF(iStep.GT.0)THEN
+    percent=percent+1
+    WRITE(0,'(I4,A23,A1)',ADVANCE='NO')percent, ' % of nodes evaluated...',ACHAR(13)
+  END IF
+  minNode=istep*nnodes+1
+  IF(minNode.GT.nTotal) EXIT
+  maxNode=MIN((istep+1)*nnodes,nTotal)
+  DO iNode=minNode,maxNode
+    SELECT CASE(InputCoordSys)
+    CASE(0)!x_in(1:3) = x,y,z of cylinder with r<1 and z=[0;1]
+      r_p   = SQRT(x_in(1,iNode)**2+x_in(2,iNode)**2) 
+      theta = ATAN2(x_in(2,iNode),x_in(1,iNode))
+      zeta  = -twoPi*x_in(3,iNode) 
+    CASE(1) !x_in(1:3) = (r,z,phi) with r= [0;1], z= [0;1], phi=[0;1] 
+      r_p =  x_in(1,iNode) ! =r
+      theta = twoPi*x_in(3,iNode) ! =2*pi*phi
+      zeta  = twoPi*x_in(2,iNode) ! =2*pi*z
+    END SELECT 
+  
+    xin2(:,iNode)=(/r_p,theta,-zeta/)
+  END DO
+
+#ifdef PP_GVEC
+  CALL Eval_GVEC(maxnode-minnode+1,xin2(:,minnode:maxnode), &
+                                  x_out(:,minnode:maxnode),&
+                           MHDEQdata(2:10,minnode:maxnode),phi_edge_axis,chi_edge_axis)
+#endif
+
+
+
+  DO iNode=minNode,maxNode
+    phi_int=MHDEQdata(7,iNode)
+    chi_int=MHDEQdata(6,iNode)
+    ! output of progress in %
+    !NOTE: Phi is the toroidal flux, called PHI in GVEC
+    Phinorm=(phi_int-phi_edge_axis(1))/(phi_edge_axis(2)-phi_edge_axis(1))
+    Chinorm=(chi_int-chi_edge_axis(1))/(chi_edge_axis(2)-chi_edge_axis(1))
+    
+    SELECT CASE (RhoFluxVar)
+    CASE(0) !use normalized toroidal flux 
+      Density=Eval1DPoly(nRhoCoefs,RhoCoefs,Phinorm) 
+    CASE(1) !use normalized poloidal flux 
+      Density=Eval1DPoly(nRhoCoefs,RhoCoefs,chinorm) 
+    CASE(2) !use sqrt of normalized toroidal flux 
+      Density=Eval1DPoly(nRhoCoefs,RhoCoefs,sqrt(Phinorm))
+    CASE(3) !use sqrt of normalized poloidal flux 
+      Density=Eval1DPoly(nRhoCoefs,RhoCoefs,sqrt(chinorm))
+    CASE DEFAULT
+      STOP 'RhoFluxVar for GVEC eq. not between 0 or 3'
+    END SELECT
+    
+    MHDEQdata(  1,iNode)=Density
+    MHDEQdata(  2,iNode)=MHDEQdata(2,iNode)*mu0 !pressure transformed to mu0=1
+!    MHDEQdata( 3:5,iNode)=Bcart(:)
+!    MHDEQdata(   6,iNode)=chi_int !poloidal flux
+!    MHDEQdata(   7,iNode)=Phi_int !toroidal flux
+!    MHDEQdata(8:10,iNode)=Acart(:)
+
+  END DO !iNode=1,nTotal
+END DO !istep
+!WRITE(UNIT_stdOut,'(A,4(1X,E12.5))')'  Rmin/Zmax, Zmin/Zmax ', Rmin,Rmax,Zmin,Zmax 
+WRITE(UNIT_stdOut,'(A,2(1X,E12.5))')'  xmin/xmax', MINVAL(x_out(1,:)),MAXVAL(x_out(1,:))
+WRITE(UNIT_stdOut,'(A,2(1X,E12.5))')'  ymin/ymax', MINVAL(x_out(2,:)),MAXVAL(x_out(2,:))
+WRITE(UNIT_stdOut,'(A,2(1X,E12.5))')'  zmin/zmax', MINVAL(x_out(3,:)),MAXVAL(x_out(3,:))
+
+WRITE(UNIT_stdOut,'(A)')'  ...DONE.                             '
+
+END SUBROUTINE MapToGVEC 
+
 
 !===================================================================================================================================
-!> Finalize Module
+!> Finalize GVEC module
 !!
 !===================================================================================================================================
-SUBROUTINE FinalizeMHDEQ 
+SUBROUTINE FinalizeGVEC 
 ! MODULES
-USE MOD_MHDEQ_Vars
-USE MOD_VMEC,  ONLY:FinalizeVMEC
-USE MOD_GVEC,  ONLY:FinalizeGVEC
-USE MOD_Solov, ONLY:FinalizeSolov
-
+USE MOD_GVEC_Vars
+#ifdef PP_GVEC
+USE MODgvec_Eval_GVEC,ONLY:FinalizeEval_GVEC
+#endif
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
-! INPUT VARIABLES
+! INPUT/OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
 !===================================================================================================================================
-SELECT CASE(whichEquilibrium)
-CASE(1)
-  CALL FinalizeVMEC()
-CASE(2)
-  CALL FinalizeSolov()
-CASE(3)
-  CALL FinalizeGVEC()
-END SELECT
 
-DEALLOCATE(MHDEQoutdataGL)
-DEALLOCATE(MHDEQdataEq)
-DEALLOCATE(RhoCoefs)
+#ifdef PP_GVEC
+  CALL FinalizeEval_GVEC()
+#endif
 
+END SUBROUTINE FinalizeGVEC
 
-END SUBROUTINE FinalizeMHDEQ
-
-END MODULE MOD_MHDEQ
+END MODULE MOD_GVEC

@@ -86,6 +86,7 @@ OPTION(HOPR_BUILD_CGNS "Compile and build CGNS library" ON)
 OPTION(HOPR_BUILD_OPENMP "Compile with OPENMP" OFF)
 SET(HOPR_CGNS_INT "32" CACHE STRING "integer type in CGNS lib")
 
+OPTION(HOPR_GVEC "Link to local GVEC library " OFF)
 OPTION(HOPR_NETCDF "Link to local NetCDF library" ON)
 # =========================================================================
 # USERBLOCK + Preproc_flags
@@ -306,6 +307,16 @@ IF(HOPR_NETCDF)
   MESSAGE(STATUS "Building HOPR with NetCDF")
 ENDIF()
 
+IF(HOPR_GVEC)
+  SET(HOPR_GVEC_DIR "/home/ipphinde/GIT/gvec/build" CACHE STRING "path to gvec build dir")
+  ADD_DEFINITIONS(-DPP_GVEC=${HOPR_GVEC})
+  
+  LIST( APPEND linkedlibs ${HOPR_GVEC_DIR}/lib/libevallib.a )
+  INCLUDE_DIRECTORIES (${HOPR_GVEC_DIR}/include)
+  MESSAGE(STATUS "Building HOPR with GVEC")
+ELSE()
+  UNSET(HOPR_GVEC_DIR)
+ENDIF()
 # =========================================================================
 # CGNS library
 # =========================================================================
@@ -340,6 +351,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
+
 # =========================================================================
 # HOPR sources & targets
 # =========================================================================
@@ -366,6 +378,7 @@ FILE(GLOB_RECURSE hoprF90 ./src/basis/*.f90
                           ./src/search/*.f90
                           ./src/sfc/*.f90
                           ./src/mhdeq/mhdeq*.f90
+                          ./src/mhdeq/gvec/*.f90
                           ./src/mhdeq/vmec/vmec*.f90
                           ./src/mhdeq/vmec/track*.f90
                           ./src/mhdeq/solov/*.f90

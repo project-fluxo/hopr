@@ -63,7 +63,7 @@ USE MOD_Globals,ONLY:UNIT_stdOut,abort
 USE MOD_ReadInTools
 USE MOD_GVEC_Vars
 #ifdef PP_GVEC
-USE MODgvec_EVAL_GVEC, ONLY: InitEval_GVEC
+USE MODgvec_gvec_to_hopr, ONLY: Init_gvec_to_hopr
 #endif /*PP_GVEC*/
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
@@ -81,9 +81,9 @@ WRITE(UNIT_stdOut,'(A)')'  INIT GVEC INPUT ...'
 GVECdataFile=GETSTR("GVECwoutfile")
 
 #ifdef PP_GVEC
-CALL InitEval_GVEC(GVECdataFile)
+CALL Init_gvec_to_hopr(GVECdataFile)
 #else
-STOP 'HOPR NOT COMPILED WITH GVEC!!!'
+STOP 'TRYING TO USE GVEC INTERFACE, BUT HOPR IS NOT LINKED TO GVEC!!!'
 #endif /*PP_GVEC*/
 
 WRITE(UNIT_stdOut,'(A)')'  ... DONE'
@@ -101,7 +101,7 @@ USE MOD_MHDEQ_Vars,    ONLY: nRhoCoefs,RhoFluxVar,RhoCoefs
 USE MOD_MHDEQ_Tools,   ONLY: Eval1DPoly
 USE MOD_GVEC_Vars,     ONLY: wp,twoPi,mu0,GVECdatafile
 #ifdef PP_GVEC
-USE MODgvec_Eval_GVEC , ONLY: Eval_GVEC
+USE MODgvec_gvec_to_hopr , ONLY: gvec_to_hopr 
 #endif
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
@@ -152,7 +152,7 @@ DO istep=0,nsteps-1
   END DO
 
 #ifdef PP_GVEC
-  CALL Eval_GVEC(maxnode-minnode+1,xin2(:,minnode:maxnode), &
+  CALL gvec_to_hopr(maxnode-minnode+1,xin2(:,minnode:maxnode), &
                                   x_out(:,minnode:maxnode),&
                            MHDEQdata(2:10,minnode:maxnode),phi_edge_axis,chi_edge_axis)
 #endif
@@ -207,7 +207,7 @@ SUBROUTINE FinalizeGVEC
 ! MODULES
 USE MOD_GVEC_Vars
 #ifdef PP_GVEC
-USE MODgvec_Eval_GVEC,ONLY:FinalizeEval_GVEC
+USE MODgvec_gvec_to_hopr,ONLY:Finalize_gvec_to_hopr
 #endif
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ IMPLICIT NONE
 !===================================================================================================================================
 
 #ifdef PP_GVEC
-  CALL FinalizeEval_GVEC()
+  CALL Finalize_gvec_to_hopr()
 #endif
 
 END SUBROUTINE FinalizeGVEC

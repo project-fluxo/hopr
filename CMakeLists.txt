@@ -311,7 +311,7 @@ IF(HOPR_GVEC)
   SET(HOPR_GVEC_DIR "/home/ipphinde/GIT/gvec/build" CACHE STRING "path to gvec build dir")
   ADD_DEFINITIONS(-DPP_GVEC=${HOPR_GVEC})
   
-  LIST( APPEND linkedlibs ${HOPR_GVEC_DIR}/lib/libevallib.a )
+  LIST( APPEND linkedlibs ${HOPR_GVEC_DIR}/lib/libgveclib.a )
   INCLUDE_DIRECTORIES (${HOPR_GVEC_DIR}/include)
   MESSAGE(STATUS "Building HOPR with GVEC")
 ELSE()

@@ -548,7 +548,7 @@ ALLOCATE(xt1(Nplot_p1_3,3))
 ALLOCATE(xt2(Nplot_p1_3,3))
 ALLOCATE(xt3(Nplot_p1_3,3))
 ALLOCATE(Jac(Nplot_p1_3))
-nVal=4
+nVal=5
 IF(useMHDEQ) THEN
   ALLOCATE(MHDEQdataNode((N+1)**3,nVarMHDEQ))
   nVal=nVal+nVarMHDEQ
@@ -559,7 +559,8 @@ VarNames(1)='elemind'
 VarNames(2)='Jacobian'
 VarNames(3)='scaledJacobian'
 VarNames(4)='scaledJacElem'
-IF(useMHDEQ) VarNames(5:4+nVarMHDEQ)=MHDEQvarnames(:)
+VarNames(5)='zone'
+IF(useMHDEQ) VarNames(6:5+nVarMHDEQ)=MHDEQvarnames(:)
 
 ALLOCATE(Coord(    3,Nplot_p1_3,nCurveds))
 ALLOCATE(Values(nVal,Nplot_p1_3,nCurveds))
@@ -606,8 +607,9 @@ DO WHILE(ASSOCIATED(Elem))
         END DO
       END DO
       Values(1,:,iElem)=Elem%ind
+      Values(5,:,iElem)=Elem%zone
       Values(4,:,iElem)=MINVAL(Values(3,:,iElem))
-      IF(useMHDEQ) Values(5:4+nVarMHDEQ,:,iElem)  = TRANSPOSE(MATMUL(Vdm_VisHex,MHDEQDataNode(1:nNodes,:)))
+      IF(useMHDEQ) Values(6:5+nVarMHDEQ,:,iElem)  = TRANSPOSE(MATMUL(Vdm_VisHex,MHDEQDataNode(1:nNodes,:)))
     END SELECT
   END IF
   Elem=>Elem%nextElem

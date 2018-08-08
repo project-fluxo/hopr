@@ -45,6 +45,7 @@ REAL(wp),ALLOCATABLE    :: rho(:)                    !< := sqrt(phinorm) at all 
 REAL(wp),ALLOCATABLE    :: pres_Spl(:,:)             !< Spline coefficients in (rho) for Pressure, (1:4,nFluxVMEC)
 REAL(wp),ALLOCATABLE    :: Phi_Spl(:,:)              !< Spline coefficients in (rho) for Phi, (1:4,nFluxVMEC)
 REAL(wp),ALLOCATABLE    :: chi_Spl(:,:)              !< Spline coefficients in (rho) for chi, (1:4,nFluxVMEC)
+REAL(wp),ALLOCATABLE    :: iota_Spl(:,:)             !< Spline coefficients in (rho) for chi, (1:4,nFluxVMEC)
 REAL(wp),ALLOCATABLE    :: Rmnc_Spl(:,:,:)           !< modified spline coefficients R cosine, (1:4,iFlux,iMode)
 REAL(wp),ALLOCATABLE    :: Rmns_Spl(:,:,:)           !< modified spline coefficients R sine,   (1:4,iFlux,iMode)
 REAL(wp),ALLOCATABLE    :: lmnc_Spl(:,:,:)           !< modified spline coefficients of lambda cosine , (1:4,iFlux,iMode)

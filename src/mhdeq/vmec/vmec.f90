@@ -177,6 +177,10 @@ ALLOCATE(chi_spl(4,1:nFluxVMEC))
 chi_spl(1,:)=chi_Prof(:)
 CALL SPLINE1_FIT(nFluxVMEC,rho,chi_Spl(:,:), K_BC1=3, K_BCN=0)
 
+ALLOCATE(iota_spl(4,1:nFluxVMEC))
+pres_spl(1,:)=iotaf(:)
+CALL SPLINE1_FIT(nFluxVMEC,rho,iota_Spl(:,:), K_BC1=3, K_BCN=0)
+
 WRITE(Unit_stdOut,'(4X,A,3F10.4)')'iota axis/middle/edge',iotaf(1),iotaf(nFluxVMEC/2),iotaf(nFluxVMEC)
 
 
@@ -535,10 +539,13 @@ DO iNode=1,nTotal
   chi_int=splout(1)
   dchi_drho_int=splout(2)
 
-!  CALL SPLINE1_EVAL((/1,0,0/), nFluxVMEC,rho_p,rho,iota_Spl(:,:),iGuess,splout) 
-!  iota_int=splout(1)
-!   iota should be >0, chi is growing radially, but Phi is decreasing radially 
-  iota_int = dchi_drho_int/dPhi_drho_int 
+  IF(chi_int.LT.0.) THEN !chi was not read!
+    CALL SPLINE1_EVAL((/1,0,0/), nFluxVMEC,rho_p,rho,iota_Spl(:,:),iGuess,splout) 
+    iota_int=splout(1)
+  ELSE
+  !   iota should be >0, chi is growing radially, but Phi is decreasing radially 
+    iota_int = dchi_drho_int/dPhi_drho_int 
+  END IF
 
   ! compute magnetic field, following Michael Kraus formulas: 
   ! B^s     = 0 
@@ -721,6 +728,7 @@ IMPLICIT NONE
   DEALLOCATE(pres_spl)
   DEALLOCATE(Phi_spl)
   DEALLOCATE(chi_spl)
+  DEALLOCATE(iota_spl)
 
 END SUBROUTINE FinalizeVMEC
 

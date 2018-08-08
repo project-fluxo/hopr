@@ -137,6 +137,7 @@ REAL,INTENT(OUT)   :: x_out(3,nTotal) ! mapped x,y,z coordinates with vmec data
 REAL,INTENT(OUT)   :: MHDEQdata(nVarMHDEQ,nTotal) 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+INTEGER :: i
 !===================================================================================================================================
 SELECT CASE(whichEquilibrium)
 CASE(1)
@@ -146,6 +147,16 @@ CASE(2)
 CASE(3)
   CALL MapToGVEC(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 END SELECT
+WRITE(*,'(A)',ADVANCE='NO')'MIN MHDeqdata   : '
+DO i=1,nVarMHDEQ-1
+  WRITE(*,'(E14.6)',ADVANCE='NO')MINVAL(MHDEQdata(i,:))
+END DO
+WRITE(*,'(E14.6)')MINVAL(MHDEQdata(nVarMHDEQ,:))
+WRITE(*,'(A)',ADVANCE='NO')'MAX MHDeqdata   : '
+DO i=1,nVarMHDEQ-1
+  WRITE(*,'(E14.6)',ADVANCE='NO')MAXVAL(MHDEQdata(i,:))
+END DO
+WRITE(*,'(E14.6)')MAXVAL(MHDEQdata(nVarMHDEQ,:))
 END SUBROUTINE MapToMHDEQ 
 
 !===================================================================================================================================

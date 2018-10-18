@@ -20,9 +20,9 @@
 !
 ! You should have received a copy of the GNU General Public License along with HOPR. If not, see <http://www.gnu.org/licenses/>.
 !=================================================================================================================================
-MODULE MOD_MHDEQ_Vars
+MODULE MOD_Cyl1D_Vars
 !===================================================================================================================================
-! Variables for the MHD equilibrium mapping / data
+! Parameters for 1d radial equilibrium in a cylinder of size [0,1]
 !===================================================================================================================================
 ! MODULES
 ! IMPLICIT VARIABLE HANDLING
@@ -30,40 +30,18 @@ IMPLICIT NONE
 PUBLIC
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! GLOBAL VARIABLES 
-INTEGER             :: WhichEquilibrium                ! 0: do nothing (default), 1: use VMEC data, 2: use Solov'ev equilibrium
-INTEGER             :: InputCoordSys                   ! 0: x_in(1:3)=(x,y,z) with r^2=x^2+y^2,r=[0,1], z=[0,1]
-                                                       ! 1: x_in(1:3)= (rho,zeta,theta) rho[0,1],zeta[0,1],theta[0,1] 
-LOGICAL             :: useMHDEQ                        ! =(whichEquilibrium>0)
-INTEGER             :: nVarMHDEQ=13
-REAL,ALLOCATABLE    :: MHDEQoutdataGL(:,:,:,:,:)       ! MHD equilibrium data to be written to hdf5 file, on Gauss-Lobatto nodes
-REAL,ALLOCATABLE    :: MHDEQdataEq(:,:,:,:,:)          ! VMEC data on equidistant nodes (forvisualization) 
-INTEGER             :: nRhoCoefs                 ! number of density coefficients 
-INTEGER             :: RhoFluxVar                ! Dependent variable for evaluation of Density polynomial rho(x)
-                                                 ! =0: x=psinorm Normalized TOROIDAL flux
-                                                 ! =1: x=chinorm Normalized POLOIDAL flux 
-                                                 ! =2: x=sqrt(psinorm), =3: x=sqrt(chinorm)
-REAL,ALLOCATABLE    :: RhoCoefs(:)               ! density coefficients of the polynomial coefficients:
-                                                 ! rho_1+rho_2*x + rho_3*x^2 ...
-                                                
-CHARACTER(LEN=255),DIMENSION(13),PARAMETER :: MHDEQvarNames(13)=(/ CHARACTER(LEN=255) :: &
-                      'MHDEQ-Density'     & ! 1 
-                     ,'MHDEQ-Pressure'    & ! 2
-                     ,'MHDEQ-BX'          & ! 3
-                     ,'MHDEQ-BY'          & ! 4
-                     ,'MHDEQ-BZ'          & ! 5
-                     ,'MHDEQ-polflux'     & ! 6
-                     ,'MHDEQ-torflux'     & ! 7
-                     ,'MHDEQ-AX'          & ! 8
-                     ,'MHDEQ-AY'          & ! 9
-                     ,'MHDEQ-AZ'          & !10    
-                     ,'MHDEQ-ohmVelX'     & !11 !velocity from ohms law, must be scaled with constant eta_0
-                     ,'MHDEQ-ohmVelY'     & !12
-                     ,'MHDEQ-ohmVelZ'     & !13    
-                                         /)
+REAL                     :: alpha0         !< scaling parameter E_0/eta_0 
+REAL                     :: eta_param(3)   !< parameters (A,B,C) for radial dependence of eta=eta_0*(1+A*r^B)^C 
+REAL                     :: bz0            !< z-component of magnetic field at the axis (r=0)
+
+INTEGER                  :: nps            !< number of points used for the 
+REAL,ALLOCATABLE         :: rSpl(:)        !< spline points positions
+REAL,ALLOCATABLE         :: ohmBt_Spl(:,:) !< spline coeff. of b_theta
+REAL,ALLOCATABLE         :: ohmBz_Spl(:,:) !< spline coeff. of bz
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Private Part ---------------------------------------------------------------------------------------------------------------------
 ! Public Part ----------------------------------------------------------------------------------------------------------------------
 !===================================================================================================================================
-END MODULE MOD_MHDEQ_Vars
+END MODULE MOD_Cyl1D_Vars
 

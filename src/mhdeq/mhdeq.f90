@@ -65,6 +65,7 @@ USE MOD_MHDEQ_Vars
 USE MOD_VMEC, ONLY:InitVMEC
 USE MOD_GVEC, ONLY:InitGVEC
 USE MOD_Solov, ONLY:InitSolov
+USE MOD_cyl1d, ONLY:Initcyl1d
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -95,15 +96,22 @@ CASE(3)
   useMHDEQ=.TRUE.
   WRITE(*,*)'Using GVEC as equilibrium solution...'
   CALL InitGVEC()
+CASE(4)
+  useMHDEQ=.TRUE.
+  WRITE(*,*)'Using CYL1D as equilibrium solution...'
+  CALL InitCyl1d()
 CASE DEFAULT
   WRITE(*,*)'WARNING: No Equilibrium solution for which Equilibrium= ', whichEquilibrium
   STOP
 END SELECT
   !density coefficients of the polynomial coefficients: rho_1+rho_2*x + rho_3*x^2 ...
-  nRhoCoefs=GETINT("nRhoCoefs","0")
-  IF(nRhoCoefs.GT.0)THEN
+  nRhoCoefs=GETINT("nRhoCoefs","1")
+  ALLOCATE(RhoCoefs(nRhoCoefs))
+  IF(nRhoCoefs.EQ.1)THEN !default = 1.
+    RhoFluxVar=GETINT("RhoFluxVar","0") ! dependant variable: =0: psinorm (tor. flux), =1:chinorm (pol. flux)
+    RhoCoefs=GETREALARRAY("RhoCoefs",nRhoCoefs,"1.0")
+  ELSE
     RhoFluxVar=GETINT("RhoFluxVar") ! dependant variable: =0: psinorm (tor. flux), =1:chinorm (pol. flux)
-    ALLOCATE(RhoCoefs(nRhoCoefs))
     RhoCoefs=GETREALARRAY("RhoCoefs",nRhoCoefs)
   END IF
   InputCoordSys=GETINT("MHDEQ_inputCoordSys","0")
@@ -125,6 +133,7 @@ USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,whichEquilibrium,InputCoordSys
 USE MOD_VMEC, ONLY:MapToVMEC
 USE MOD_GVEC, ONLY:MapToGVEC
 USE MOD_Solov, ONLY:MapToSolov
+USE MOD_Cyl1d, ONLY:MapToCyl1d
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -146,6 +155,8 @@ CASE(2)
   CALL MapToSolov(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 CASE(3)
   CALL MapToGVEC(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
+CASE(4)
+  CALL MapToCyl1d(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 END SELECT
 WRITE(*,'(A)',ADVANCE='NO')'MIN MHDeqdata   : '
 DO i=1,nVarMHDEQ-1

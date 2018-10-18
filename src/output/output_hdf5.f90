@@ -63,7 +63,7 @@ USE MOD_Output_Vars,ONLY:dosortIJK,OutputNodeType,OutputNodeTypeStr
 USE MOD_Mesh_Vars,ONLY:nUserDefinedBoundaries,BoundaryName,BoundaryType
 USE MOD_Mesh_Basis,ONLY:ISORIENTED
 USE MOD_Basis_Vars,ONLY:RefNodeXi,CurrentNodeType
-USE MOD_MHDEQ_Vars,ONLY:useMHDEQ,MHDEQvarNames,nVarMHDEQ,MHDEQoutdataGL
+USE MOD_MHDEQ_Vars,ONLY:useMHDEQ,whichEquilibrium,MHDEQvarNames,nVarMHDEQ,MHDEQoutdataGL
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -388,7 +388,8 @@ END IF
 
 
 IF(useMHDEQ)THEN
-  CALL WriteAttribute(File_ID,'MHDEQdata_Version',1,IntScalar=2)
+  CALL WriteAttribute(File_ID,'MHDEQdata_Version',1,IntScalar=3)
+  CALL WriteAttribute(File_ID,'MHDEQdata_whichEq',1,IntScalar=whichEquilibrium)
   CALL WriteArrayToHDF5(File_ID,'MHDEQdata_VarNames',1,(/nVarMHDEQ/),StrArray=MHDEQvarNames)
   CALL WriteArrayToHDF5(File_ID,'MHDEQdata_GL',5,(/nVarMHDEQ,N+1,N+1,N+1,nElems/),RealArray=MHDEQoutdataGL)
 END IF !useMHDEQ

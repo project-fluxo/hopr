@@ -378,6 +378,7 @@ FILE(GLOB_RECURSE hoprF90 ./src/basis/*.f90
                           ./src/search/*.f90
                           ./src/sfc/*.f90
                           ./src/mhdeq/mhdeq*.f90
+                          ./src/mhdeq/cyl1d/*.f90
                           ./src/mhdeq/gvec/*.f90
                           ./src/mhdeq/vmec/vmec*.f90
                           ./src/mhdeq/vmec/track*.f90

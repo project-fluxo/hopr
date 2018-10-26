@@ -89,29 +89,6 @@ useSFL=GETLOGICAL("VMEC_useSFL",".FALSE.")
 ! read VMEC 2000 output (netcdf)
 CALL ReadVmec(VMECdataFile)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! transform VMEC data (R,phi=zeta,Z) to GVEC right hand side system (R,Z,phi), swap sign of zeta  
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!DO iMode=1,mn_mode
-!  IF(xm(iMode).EQ.0)THEN
-!    !xn for m=0 are only positive, so we need to swap the sign of sinus coefficients 
-!    ! -coef_{0n} sin(-n*(-zeta))= coef_{0n} sin(-n*zeta)
-!    !( cosine cos(-n*(-zeta))=cos(-n*zeta), symmetric in zeta for m=0)
-!    zmns(iMode,:)=-zmns(iMode,:)
-!    lmns(iMode,:)=-lmns(iMode,:)
-!    IF(lasym) THEN
-!      rmns(iMode,:)=-rmns(iMode,:)
-!    END IF    
-!  ELSE
-!    !for m>0 , xn are always pairs of negative and positive modes, 
-!    !so here we can simply swap the sign of the mode number
-!    xn(iMode)=-xn(iMode)
-!  END IF
-!END DO !iMode=1,mn_mode
-!! also iota must change sign, since its sign depend on the coordinate system
-!iotaf=-iotaf
-!chi=-chi
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 !toroidal flux from VMEC
@@ -568,7 +545,7 @@ DO iNode=1,nTotal
     CALL SPLINE1_EVAL((/1,0,0/), nFluxVMEC,rho_p,rho,iota_Spl(:,:),iGuess,splout) 
     iota_int=splout(1)
   ELSE
-  !   iota =chi'/phi'
+  !   iota is =chi'/phi'
     iota_int = dchi_drho_int/dPhi_drho_int 
   END IF
 

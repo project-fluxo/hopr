@@ -89,6 +89,29 @@ useSFL=GETLOGICAL("VMEC_useSFL",".FALSE.")
 ! read VMEC 2000 output (netcdf)
 CALL ReadVmec(VMECdataFile)
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! transform VMEC data (R,phi=zeta,Z) to GVEC right hand side system (R,Z,phi), swap sign of zeta  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!DO iMode=1,mn_mode
+!  IF(xm(iMode).EQ.0)THEN
+!    !xn for m=0 are only positive, so we need to swap the sign of sinus coefficients 
+!    ! -coef_{0n} sin(-n*(-zeta))= coef_{0n} sin(-n*zeta)
+!    !( cosine cos(-n*(-zeta))=cos(-n*zeta), symmetric in zeta for m=0)
+!    zmns(iMode,:)=-zmns(iMode,:)
+!    lmns(iMode,:)=-lmns(iMode,:)
+!    IF(lasym) THEN
+!      rmns(iMode,:)=-rmns(iMode,:)
+!    END IF    
+!  ELSE
+!    !for m>0 , xn are always pairs of negative and positive modes, 
+!    !so here we can simply swap the sign of the mode number
+!    xn(iMode)=-xn(iMode)
+!  END IF
+!END DO !iMode=1,mn_mode
+!! also iota must change sign, since its sign depend on the coordinate system
+!iotaf=-iotaf
+!chi=-chi
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 !toroidal flux from VMEC
@@ -178,11 +201,13 @@ chi_spl(1,:)=chi_Prof(:)
 CALL SPLINE1_FIT(nFluxVMEC,rho,chi_Spl(:,:), K_BC1=3, K_BCN=0)
 
 ALLOCATE(iota_spl(4,1:nFluxVMEC))
-pres_spl(1,:)=iotaf(:)
+iota_spl(1,:)=iotaf(:)
 CALL SPLINE1_FIT(nFluxVMEC,rho,iota_Spl(:,:), K_BC1=3, K_BCN=0)
 
-WRITE(Unit_stdOut,'(4X,A,3F10.4)')'iota axis/middle/edge',iotaf(1),iotaf(nFluxVMEC/2),iotaf(nFluxVMEC)
-
+WRITE(Unit_stdOut,'(4X,A,3F12.4)')'tor. flux Phi  axis/middle/edge',Phi(1)*TwoPi,Phi(nFluxVMEC/2)*TwoPi,Phi(nFluxVMEC)*TwoPi
+WRITE(Unit_stdOut,'(4X,A,3F12.4)')'pol. flux chi  axis/middle/edge',chi(1)*TwoPi,chi(nFluxVMEC/2)*TwoPi,chi(nFluxVMEC)*TwoPi
+WRITE(Unit_stdOut,'(4X,A,3F12.4)')'   iota        axis/middle/edge',iotaf(1),iotaf(nFluxVMEC/2),iotaf(nFluxVMEC)
+WRITE(Unit_stdOut,'(4X,A,3F12.4)')'  pressure     axis/middle/edge',presf(1),presf(nFluxVMEC/2),presf(nFluxVMEC)
 
 WRITE(UNIT_stdOut,'(A)')'  ... DONE'
 END SUBROUTINE InitVMEC
@@ -539,11 +564,11 @@ DO iNode=1,nTotal
   chi_int=splout(1)
   dchi_drho_int=splout(2)
 
-  IF(chi_int.LT.0.) THEN !chi was not read!
+  IF(ABS(dchi_drho_int).LT.1.0e-8) THEN !chi was not read!
     CALL SPLINE1_EVAL((/1,0,0/), nFluxVMEC,rho_p,rho,iota_Spl(:,:),iGuess,splout) 
     iota_int=splout(1)
   ELSE
-  !   iota should be >0, chi is growing radially, but Phi is decreasing radially 
+  !   iota =chi'/phi'
     iota_int = dchi_drho_int/dPhi_drho_int 
   END IF
 

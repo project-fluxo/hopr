@@ -243,7 +243,7 @@ SUBROUTINE ReadVMEC(fileName)
     IF (ioError /= 0)  STOP 'VMEC READIN: problem reading phi'
 
     !! scale toroidal flux to get internal VMEC Phi
-    phi(:nFluxVMEC) = REAL(signgs, wp) * phi(:nFluxVMEC) / TwoPi
+    phi(:nFluxVMEC) = phi(:nFluxVMEC) / TwoPi
 
     !! read chi
     ioError = NF_INQ_VARID(ncid, "chi", id)
@@ -253,12 +253,12 @@ SUBROUTINE ReadVMEC(fileName)
       WRITE(*,*) 'VMEC READIN: problem reading poloidal flux chi...'
       WRITE(*,*)'  type return key to  continue (chi is set to zero, iota is used instead)'
       READ(*,*)
-      chi=-1.
+      chi=0.
       
     END IF
 
-    !! scale poloidal flux to get internal VMEC chi, WITHOUT SIGNGS (so that iota=chi'/phi' >0 )
-    chi(:nFluxVMEC) = chi(:nFluxVMEC) / TwoPi
+    !! scale poloidal flux to get internal VMEC chi, USE SIGNGS to get  iota=chi'/phi' (chipf has right sign put chi not)
+    chi(:nFluxVMEC) = REAL(signgs, wp) * chi(:nFluxVMEC) / TwoPi
 
     !! read phipf
 !    ioError = NF_INQ_VARID(ncid, "phipf", id)

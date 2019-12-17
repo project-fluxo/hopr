@@ -86,18 +86,22 @@ END IF
 SELECT CASE(whichEquilibrium)
 CASE(1)
   useMHDEQ=.TRUE.
+  nVarMHDEQ =10
   WRITE(*,*)'Using VMEC as equilibrium solution...'
   CALL InitVMEC()
 CASE(2)
   useMHDEQ=.TRUE.
+  nVarMHDEQ =10
   WRITE(*,*)'Using Soloviev as equilibrium solution...'
   CALL InitSolov()
 CASE(3)
   useMHDEQ=.TRUE.
+  nVarMHDEQ =10
   WRITE(*,*)'Using GVEC as equilibrium solution...'
   CALL InitGVEC()
 CASE(4)
   useMHDEQ=.TRUE.
+  nVarMHDEQ =13
   WRITE(*,*)'Using CYL1D as equilibrium solution...'
   CALL InitCyl1d()
 CASE DEFAULT
@@ -129,7 +133,7 @@ SUBROUTINE MapToMHDEQ(nTotal,x_in,x_out,MHDEQdata)
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
-USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,whichEquilibrium,InputCoordSys
+USE MOD_MHDEQ_Vars, ONLY: nVarMHDEQ,MHDEQvarNames,whichEquilibrium,InputCoordSys
 USE MOD_VMEC, ONLY:MapToVMEC
 USE MOD_GVEC, ONLY:MapToGVEC
 USE MOD_Solov, ONLY:MapToSolov
@@ -158,16 +162,10 @@ CASE(3)
 CASE(4)
   CALL MapToCyl1d(nTotal,x_in,InputCoordSys,x_out,MHDEQdata)
 END SELECT
-WRITE(*,'(A)',ADVANCE='NO')'MIN MHDeqdata   : '
-DO i=1,nVarMHDEQ-1
-  WRITE(*,'(E14.6)',ADVANCE='NO')MINVAL(MHDEQdata(i,:))
+WRITE(*,'(A21,2(1X,A21))')'MHDeq Var ',' Min' ,' Max'
+DO i=1,nVarMHDEQ
+  WRITE(*,'(A21,2(1X,E21.11))')MHDEQvarNames(i),MINVAL(MHDEQdata(i,:)),MAXVAL(MHDEQdata(i,:))
 END DO
-WRITE(*,'(E14.6)')MINVAL(MHDEQdata(nVarMHDEQ,:))
-WRITE(*,'(A)',ADVANCE='NO')'MAX MHDeqdata   : '
-DO i=1,nVarMHDEQ-1
-  WRITE(*,'(E14.6)',ADVANCE='NO')MAXVAL(MHDEQdata(i,:))
-END DO
-WRITE(*,'(E14.6)')MAXVAL(MHDEQdata(nVarMHDEQ,:))
 END SUBROUTINE MapToMHDEQ 
 
 !===================================================================================================================================

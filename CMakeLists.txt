@@ -1,10 +1,16 @@
 # =========================================================================
 # HOPR CMake configuration
 # =========================================================================
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-cmake_policy (SET CMP0045 OLD)
-cmake_policy (SET CMP0046 OLD)
-
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5.1)
+# Policies (see https://cmake.org/cmake/help/v3.13/manual/cmake-policies.7.html)
+# VERSION_GREATER_EQUAL is incompatible with CMAKE versions < 3.7
+IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.6.0"))
+  SET(GITSHALLOW "GIT_SHALLOW ON")
+ENDIF()
+IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.12.0"))
+  CMAKE_POLICY(SET CMP0074 NEW)
+ENDIF()
+# Folder for custom CMake source files
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 INCLUDE(ExternalProject)
@@ -37,6 +43,8 @@ SET(HOPR_CGNSTAG "v3.3.0"             CACHE STRING "CGNS version tag")
 # =========================================================================
 SITE_NAME(CMAKE_HOSTNAME)
 STRING(FIND "${CMAKE_HOSTNAME}" "eslogin" ONHORNET)
+STRING(FIND "${CMAKE_HOSTNAME}" "marconi" ON_MARCONI)
+STRING(FIND "${CMAKE_HOSTNAME}" "cobra" ON_COBRA)
 # Set options that need to be enabled BEFORE ANY PROJECT OR LANGUAGE COMMAND
 IF (ONHORNET GREATER -1)
   SET(CMAKE_C_COMPILER       cc)
@@ -46,6 +54,12 @@ IF (ONHORNET GREATER -1)
   MARK_AS_ADVANCED(C_PATH CXX_PATH Fortran_PATH)
   MESSAGE(STATUS "Compiling on Hazelhen")
   ADD_DEFINITIONS(-DLUSTRE)
+ENDIF()
+IF (ON_MARCONI GREATER -1)
+  MESSAGE(STATUS "Compiling on Marconi")
+ENDIF()
+IF (ON_COBRA GREATER -1)
+  MESSAGE(STATUS "Compiling on Cobra")
 ENDIF()
 
 # =========================================================================
@@ -63,6 +77,7 @@ SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   SET(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH "Prefix prepended to install directories" FORCE)
 ENDIF()
+MARK_AS_ADVANCED(CMAKE_INSTALL_PREFIX)
 
 # =========================================================================
 # Options
@@ -175,7 +190,7 @@ ELSEIF (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # add flags only for compiling not linking!
    SET (HOPR_COMPILE_FLAGS "-fpp -assume bscc")
 ELSE()
-   MESSAGE(ERROR "Unknown compiler")
+  MESSAGE(SEND_ERROR "Unknown compiler")
 ENDIF()
 
 # =========================================================================
@@ -194,14 +209,13 @@ MARK_AS_ADVANCED(HOPR_EXTERNAL_LIB_DIR)
 # =========================================================================
 
 IF(NOT HOPR_BUILD_HDF5)
-  #FIND_PACKAGE(HDF5 NAMES hdf5 COMPONENTS C Fortran QUIET) #if built with configure script
-  FIND_PACKAGE(HDF5 NAMES hdf5 COMPONENTS C Fortran static NO_MODULE QUIET PATH_SUFFIXES share/cmake )
+  FIND_PACKAGE(HDF5 COMPONENTS C Fortran QUIET) #if built with configure script
   IF (HDF5_FOUND)
-    SET(HOPR_HDF5_CMAKE TRUE)
+    SET(HOPR_HDF5_CMAKE FALSE)
   ELSE()
-    FIND_PACKAGE(HDF5 COMPONENTS C Fortran QUIET )
+    FIND_PACKAGE(HDF5 COMPONENTS C Fortran static NO_MODULE QUIET PATH_SUFFIXES share/cmake )
     IF (HDF5_FOUND)
-      SET(HOPR_HDF5_CMAKE FALSE)
+      SET(HOPR_HDF5_CMAKE TRUE)
       MESSAGE (STATUS "HDF5 C libs:${HDF5_FOUND} static:${HDF5_static_C_FOUND} and shared:${HDF5_shared_C_FOUND}")
       MESSAGE (STATUS "HDF5 Fortran libs: static:${HDF5_static_Fortran_FOUND} and shared:${HDF5_shared_Fortran_FOUND}")
     ENDIF()
@@ -230,6 +244,7 @@ ELSE()
       CONFIGURE_COMMAND FC=${HOPR_HDF5FC} CC=${HOPR_HDF5CC} ${HOPR_HDF5_DIR}/src/HDF5/configure --prefix=${HOPR_HDF5_DIR} --enable-fortran ${HOPR_HDF5PARALLEL} --disable-shared --libdir=${HOPR_HDF5_DIR}/lib
       BUILD_COMMAND ${MAKE}
     )
+    LIST(APPEND SELFBUILTEXTERNALS HDF5)
     # CMake HDF5 is fast but not that reliable
   #    ExternalProject_Add(HDF5
   #      GIT_REPOSITORY ${HDF5DOWNLOAD}
@@ -255,12 +270,12 @@ ELSE()
 ENDIF()
 
 IF(HOPR_HDF5_CMAKE)
-  INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR_FORTRAN} ${HDF5_INCLUDE_DIR})
+  INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIR} ${HDF5_INCLUDE_DIR_FORTRAN})
   LIST(APPEND linkedlibs ${HDF5_FORTRAN_STATIC_LIBRARY} ${HDF5_LIBRARIES})
 ELSE()
   INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR_FORTRAN} ${HDF5_INCLUDE_DIR})
   MESSAGE(STATUS "Found HDF5 Libs: " ${HDF5_LIBRARIES})
-  LIST(APPEND linkedlibs ${HDF5_FORTRAN_STATIC_LIBRARY} ${HDF5_LIBRARIES})
+  LIST(APPEND linkedlibs ${HDF5_LIBRARIES} )
 ENDIF()
 
 # =========================================================================
@@ -311,7 +326,7 @@ IF(HOPR_GVEC)
   SET(HOPR_GVEC_DIR "/home/ipphinde/GIT/gvec/build" CACHE STRING "path to gvec build dir")
   ADD_DEFINITIONS(-DPP_GVEC=${HOPR_GVEC})
   
-  LIST( APPEND linkedlibs ${HOPR_GVEC_DIR}/lib/libgveclib.a )
+  LIST( APPEND linkedlibs ${HOPR_GVEC_DIR}/lib/libgveclib.so )
   INCLUDE_DIRECTORIES (${HOPR_GVEC_DIR}/include)
   MESSAGE(STATUS "Building HOPR with GVEC")
 ELSE()
@@ -337,6 +352,7 @@ IF (HOPR_BUILD_CGNS)
     -DCGNS_ENABLE_FORTRAN=ON   -DCGNS_ENABLE_64BIT=${HOPR_CGNS_64BIT} -DCGNS_BUILD_SHARED=OFF -DCGNS_USE_SHARED=OFF /
     -DCMAKE_BUILD_TYPE=Release -DCGNS_BUILD_CGNSTOOLS=OFF -DCGNS_ENABLE_HDF5=OFF -DCGNS_ENABLE_PARALLEL=OFF -DCGNS_ENABLE_TESTS=OFF -DCMAKE_SKIP_RPATH=ON
     )
+    LIST(APPEND SELFBUILTEXTERNALS cgns)
   ENDIF()
   LIST(APPEND linkedlibs ${HOPR_CGNS_DIR}/build/lib/libcgns.a)
   INCLUDE_DIRECTORIES(${HOPR_CGNS_DIR}/build/include)
@@ -367,7 +383,7 @@ function(add_exec target)
 endfunction()
 
 # include hopr.h
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_Fortran_MODULE_DIRECTORY}) 
 
 
 # collect all F90 files needed for hoprlib
@@ -397,10 +413,12 @@ SET_TARGET_PROPERTIES(hoprlibF90 PROPERTIES COMPILE_FLAGS ${HOPR_COMPILE_FLAGS})
 ADD_LIBRARY(hoprlibC OBJECT ${hoprC})
 SET_TARGET_PROPERTIES(hoprlibC PROPERTIES LINKER_LANGUAGE C)
 ADD_LIBRARY(hoprlib STATIC $<TARGET_OBJECTS:hoprlibF90> $<TARGET_OBJECTS:hoprlibC>)
-ADD_DEPENDENCIES(hoprlibF90 HDF5 cgns)
+IF(SELFBUILTEXTERNALS)
+  ADD_DEPENDENCIES(hoprlibF90 ${SELFBUILTEXTERNALS})
+ENDIF()
 
 add_exec(hopr ./src/hopr.f90)
-ADD_DEPENDENCIES(hopr hoprlib HDF5 cgns)
+ADD_DEPENDENCIES(hopr hoprlib ${INTERNALLIBS})
 
 # =========================================================================
 # Y+-Estimator Tool
@@ -421,7 +439,13 @@ IF(CTAGS_PATH)
 ENDIF(CTAGS_PATH)
 
 # =========================================================================
+# Install
+# =========================================================================
+
+INSTALL(FILES    ${CMAKE_Fortran_MODULE_DIRECTORY}/configuration-cmake.f90 DESTINATION include )
+
+# =========================================================================
 # generate .hopr in $HOME
 # =========================================================================
-ADD_CUSTOM_COMMAND(TARGET hopr POST_BUILD COMMAND echo \"export HOPR_DIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}\"        > $ENV{HOME}/.hopr)
-ADD_CUSTOM_COMMAND(TARGET hopr POST_BUILD COMMAND echo \"alias     hopr='${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hopr'\" >> $ENV{HOME}/.hopr)
+#ADD_CUSTOM_COMMAND(TARGET hopr POST_BUILD COMMAND echo \"export HOPR_DIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}\"        > $ENV{HOME}/.hopr)
+#ADD_CUSTOM_COMMAND(TARGET hopr POST_BUILD COMMAND echo \"alias     hopr='${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hopr'\" >> $ENV{HOME}/.hopr)

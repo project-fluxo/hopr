@@ -53,6 +53,8 @@ INTEGER, PARAMETER          :: UNIT_ErrFile= 999          ! Unit for writing err
 INTEGER, PARAMETER          :: UNIT_logOut = 100          ! For logging
 CHARACTER(LEN=255)          :: ProjectName                ! necessary data for in/output and name used to generate filenames from
 LOGICAL                     :: Logging                    ! Set .TRUE. to activate logging function for each processor
+INTEGER                     :: ProgressBar_oldpercent    !! for progressBar
+REAL                        :: ProgressBar_starttime     !! for progressBar
 
 
 
@@ -129,6 +131,47 @@ WRITE(UNIT_stdOut,'(A,A,A,I6.6,A)')'See ',TRIM(ProjectName),'_ERRORS.out for mor
 WRITE(UNIT_stdOut,*)
 STOP 0001
 END SUBROUTINE Abort
+
+!==================================================================================================================================
+!> Print a progress bar to screen, call either with init=0 or init>0
+!!
+!==================================================================================================================================
+SUBROUTINE ProgressBar(iter,n_iter)
+! MODULES
+!$ USE omp_lib
+IMPLICIT NONE
+!----------------------------------------------------------------------------------------------------------------------------------
+! INPUT/OUTPUT VARIABLES
+INTEGER,INTENT(IN) :: iter,n_iter  !! iter ranges from 1...n_iter
+!----------------------------------------------------------------------------------------------------------------------------------
+! LOCAL VARIABLES
+CHARACTER(LEN=8)  :: fmtstr
+INTEGER           :: newpercent
+REAL              :: endTime
+!==================================================================================================================================
+  IF(iter.LE.0)THEN !INIT
+    ProgressBar_oldpercent=0
+    CALL CPU_Time(Progressbar_StartTime)
+!$ Progressbar_StartTime=OMP_GET_WTIME()
+    WRITE(UNIT_StdOut,'(4X,A,I8)') &
+    '|       10%       20%       30%       40%       50%       60%       70%       80%       90%      100%| ... of ',n_iter
+    WRITE(UNIT_StdOut,'(4X,A1)',ADVANCE='NO')'|'
+    CALL FLUSH(UNIT_stdOut)
+  ELSE
+    newpercent=FLOOR(REAL(iter)/REAL(n_iter)*(100.0+1.0e-12))
+    WRITE(fmtstr,'(I4)')newpercent-ProgressBar_oldpercent
+    IF(newpercent-ProgressBar_oldpercent.GT.0)THEN
+      WRITE(UNIT_StdOut,'('//TRIM(fmtstr)//'("."))',ADVANCE='NO')
+      CALL FLUSH(UNIT_stdOut)
+    END IF
+    ProgressBar_oldPercent=newPercent
+    IF(newpercent.EQ.100)THEN
+      CALL CPU_Time(endTime)
+!$  endTime=OMP_GET_WTIME()
+      WRITE(Unit_stdOut,'(A3,F8.2,A)') '| [',EndTime-ProgressBar_StartTime,' sec ]'
+    END IF
+  END IF 
+END SUBROUTINE ProgressBar
 
 SUBROUTINE Timer(start,unit_in)
 !===================================================================================================================================

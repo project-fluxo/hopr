@@ -34,7 +34,7 @@ INTEGER             :: WhichEquilibrium                ! 0: do nothing (default)
 INTEGER             :: InputCoordSys                   ! 0: x_in(1:3)=(x,y,z) with r^2=x^2+y^2,r=[0,1], z=[0,1]
                                                        ! 1: x_in(1:3)= (rho,zeta,theta) rho[0,1],zeta[0,1],theta[0,1] 
 LOGICAL             :: useMHDEQ                        ! =(whichEquilibrium>0)
-INTEGER             :: nVarMHDEQ=13
+INTEGER             :: nVarMHDEQ
 REAL,ALLOCATABLE    :: MHDEQoutdataGL(:,:,:,:,:)       ! MHD equilibrium data to be written to hdf5 file, on Gauss-Lobatto nodes
 REAL,ALLOCATABLE    :: MHDEQdataEq(:,:,:,:,:)          ! VMEC data on equidistant nodes (forvisualization) 
 INTEGER             :: nRhoCoefs                 ! number of density coefficients 
@@ -56,7 +56,7 @@ CHARACTER(LEN=255),DIMENSION(13),PARAMETER :: MHDEQvarNames(13)=(/ CHARACTER(LEN
                      ,'MHDEQ-AX'          & ! 8
                      ,'MHDEQ-AY'          & ! 9
                      ,'MHDEQ-AZ'          & !10    
-                     ,'MHDEQ-ohmVelX'     & !11 !velocity from ohms law, must be scaled with constant eta_0
+                     ,'MHDEQ-ohmVelX'     & !11 !velocity from ohms law, must be scaled with constant eta_0, only used in cyl_1d
                      ,'MHDEQ-ohmVelY'     & !12
                      ,'MHDEQ-ohmVelZ'     & !13    
                                          /)

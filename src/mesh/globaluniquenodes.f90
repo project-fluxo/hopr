@@ -49,6 +49,7 @@ SUBROUTINE GlobalUniqueNodes(withOrientedOpt)
 ! Eliminates multiple nodes, checks periodic boundary conditions and connects elements to their neighbours.
 !===================================================================================================================================
 ! MODULES
+USE MOD_Globals, ONLY:ProgressBar
 USE MOD_Mesh_Vars, ONLY:tElem,tSide,tEdge,tNode,tNodePtr,FirstElem
 USE MOD_Mesh_Vars, ONLY:N,deleteNode
 USE MOD_Mesh_Vars, ONLY:SpaceQuandt
@@ -296,12 +297,9 @@ s_offset=box_di**3-1   !offset inside one box of size box_di, from the lower sfc
 
 percent=0
 nextNode=1
+CALL ProgressBar(0,ntotalNodes)
 DO iNode=1,nTotalNodes
-  ! output of progress in %
-  IF((nTotalNodes.GT.100000).AND.(MOD(iNode,(nTotalNodes/100)).EQ.0)) THEN
-    percent=percent+1
-    WRITE(0,'(I4,A23,A1)',ADVANCE='NO')percent, ' % of nodes evaluated...',ACHAR(13)
-  END IF
+  CALL ProgressBar(iNode,nTotalNodes)
   Node=>Nodes(iNode)%np
   IF(Node%tmp.GT.0) CYCLE ! node already checked
   Node%tmp=iNode !check this node

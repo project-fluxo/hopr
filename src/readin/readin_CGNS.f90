@@ -30,7 +30,9 @@ MODULE MOD_Readin_CGNS
 !===================================================================================================================================
 ! MODULES
 USE MOD_Globals
+#ifdef PP_CGNS
 USE CGNS
+#endif
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 PRIVATE
@@ -45,18 +47,18 @@ INTERFACE ReadCGNSSurfaceMesh
   MODULE PROCEDURE ReadCGNSSurfaceMesh
 END INTERFACE
 
-INTERFACE openBase
-  MODULE PROCEDURE openBase 
-END INTERFACE
-
-INTERFACE abortCGNS 
-  MODULE PROCEDURE abortCGNS
-END INTERFACE
+!INTERFACE openBase
+!  MODULE PROCEDURE openBase 
+!END INTERFACE
+!
+!INTERFACE abortCGNS 
+!  MODULE PROCEDURE abortCGNS
+!END INTERFACE
 
 PUBLIC::ReadCGNSmesh
 PUBLIC::ReadCGNSSurfaceMesh
-PUBLIC::openBase
-PUBLIC::abortCGNS
+!PUBLIC::openBase
+!PUBLIC::abortCGNS
 !===================================================================================================================================
 
 CONTAINS
@@ -78,6 +80,7 @@ IMPLICIT NONE
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+#ifdef PP_CGNS
 INTEGER                    :: iFile  ! ?
 PP_CGNS_INT_TYPE           :: iZone  ! ?
 PP_CGNS_INT_TYPE           :: nBases,nCGNSZones  ! Number of bases / zones in CGNS file
@@ -149,9 +152,13 @@ END DO ! iFile=1,nMeshFiles
 IF(MeshDim .EQ. 2) n2dNodes=nNodesGlob
   
 CALL Timer(.FALSE.)
+#else
+  STOP 'ReadCGNSmesh: CGNS library not linked'
+#endif /*def PP_CGNS*/
 END SUBROUTINE ReadCGNSmesh
 
 
+#ifdef PP_CGNS
 SUBROUTINE ReadCGNSMeshUnstruct(FirstElem_in,CGNSFile,CGNSBase,iZone,nZonesGlob,nNodesGlob)
 !===================================================================================================================================
 ! This subroutine reads unstructured 3D meshes from the CGNS file and prepares the element list. 
@@ -986,7 +993,7 @@ DO WHILE(ASSOCIATED(aElem))
 END DO !WHILE(ASSOCIATED(aElem))
 DEALLOCATE(BCIndex,BCTypeIndex,countBCs,nBCFaces)
 END SUBROUTINE ReadCGNSMeshStruct
-
+#endif /*def PP_CGNS*/
 
 
 SUBROUTINE ReadCGNSSurfaceMesh(FirstElem_in,FileName)
@@ -1006,6 +1013,7 @@ CHARACTER(LEN=255),INTENT(IN)                   :: FileName
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+#ifdef PP_CGNS
 PP_CGNS_INT_TYPE             :: iZone
 PP_CGNS_INT_TYPE             :: nBases,nCGNSZones  ! Number of bases / zones in CGNS file
 PP_CGNS_INT_TYPE             :: nNodesGlob         ! Total number of nodes in the mesh file
@@ -1219,10 +1227,13 @@ DO iZone=1,nCGNSZones
   nNodesGlob = nNodesGlob+nNodes
   nElemsGlob = nElemsGlob+nElems
 END DO ! iZone
-
+#else
+  STOP 'ReadCGNSSurfaceMesh: CGNS library not linked!'
+#endif /*def PP_CGNS*/
 END SUBROUTINE ReadCGNSSurfaceMesh
 
 
+#ifdef PP_CGNS
 SUBROUTINE openBase(ioName,mode,celldim,physdim,CGNSFile,CGNSBase,externBase_in)
 !===================================================================================================================================
 ! Opens CGNS files and, if they do not yet exist, prepares their datastructure
@@ -1373,6 +1384,8 @@ CALL cg_get_error_f(message)
 CALL closeFile(CGNSFile)
 CALL abort(sourceFile,sourceLine,compDate,compTime,message)
 END SUBROUTINE abortCGNS
+#endif /*def PP_CGNS*/
 
 END MODULE MOD_Readin_CGNS
+
 

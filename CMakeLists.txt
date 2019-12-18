@@ -36,7 +36,6 @@ ELSE()
   SET(HDF5DOWNLOAD https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git )
 ENDIF()
 SET(HOPR_HDF5TAG "hdf5-1_10_0-patch1" CACHE STRING "HDF5 version tag")
-SET(HOPR_CGNSTAG "v3.3.0"             CACHE STRING "CGNS version tag")
 
 # =========================================================================
 # Detect machine environements
@@ -97,12 +96,21 @@ ENDMACRO()
 OPTION(HOPR_MPI "Compile SINGLE or MPI version" ON)
 OPTION(HOPR_BUILD_YPLUSESTIMATOR "Compile and build Y+-Estimator" OFF)
 OPTION(HOPR_BUILD_HDF5 "Compile and build hdf5 library" ON)
-OPTION(HOPR_BUILD_CGNS "Compile and build CGNS library" ON)
 OPTION(HOPR_BUILD_OPENMP "Compile with OPENMP" OFF)
-SET(HOPR_CGNS_INT "32" CACHE STRING "integer type in CGNS lib")
 
-OPTION(HOPR_GVEC "Link to local GVEC library " OFF)
-OPTION(HOPR_NETCDF "Link to local NetCDF library" ON)
+OPTION(HOPR_LINK_TO_CGNS "switch for using cgns as a library (needed for input/output of cgns files)" OFF)
+IF (HOPR_LINK_TO_CGNS)
+  OPTION(HOPR_BUILD_CGNS "Compile and build CGNS library" ON)
+  SET(HOPR_CGNS_INT "32" CACHE STRING "integer type in CGNS lib")
+  SET(HOPR_CGNSTAG "v3.3.0"             CACHE STRING "CGNS version tag")
+ELSE()
+  UNSET( HOPR_BUILD_CGNS CACHE )
+  UNSET( HOPR_CGNS_INT CACHE )
+  UNSET( HOPR_CGNSTAG CACHE )
+ENDIF()
+
+OPTION(HOPR_LINK_TO_GVEC "Link to local GVEC library (needed for gvec input)" OFF)
+OPTION(HOPR_LINK_TO_NETCDF "Link to local NetCDF library (needed for vmec input)" OFF)
 # =========================================================================
 # USERBLOCK + Preproc_flags
 # =========================================================================
@@ -179,7 +187,7 @@ ELSEIF (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # set Flags
   SET (CMAKE_Fortran_FLAGS         "${CMAKE_Fortran_FLAGS} -r8 -i4 -traceback -warn all -shared-intel -DINTEL")
   IF(HOPR_BUILD_OPENMP)
-    SET (CMAKE_Fortran_FLAGS         "${CMAKE_Fortran_FLAGS} -openmp")
+    SET (CMAKE_Fortran_FLAGS         "${CMAKE_Fortran_FLAGS} -qopenmp")
   ENDIF()
   SET (CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS} -O2 -xHost -qopt-report0 -qopt-report-phase=vec")
   SET (CMAKE_Fortran_FLAGS_PROFILE "${CMAKE_Fortran_FLAGS} -p -O2 xHost -qopt-report0 -qopt-report-phase=vec")
@@ -281,14 +289,37 @@ ENDIF()
 # =========================================================================
 # LAPACK/MKL library
 # =========================================================================
-# use Lapack/Blas for GNU
-MESSAGE(STATUS "Using BLAS/Lapack library")
-IF (HOPR_MKL)
-  SET(BLA_VENDOR "Intel") #search only for Intel BLAS (=MKL)
+
+IF(HOPR_BUILD_OPENMP)
+  SET (MKLLIB "parallel")
+  SET (MKLLIBGNU "mkl_gnu_thread")
+ELSE()
+  SET (MKLLIB "sequential")
+  SET (MKLLIBGNU "mkl_sequential")
 ENDIF()
-FIND_PACKAGE(LAPACK QUIET)
-IF (LAPACK_FOUND)
-  LIST(APPEND linkedlibs ${LAPACK_LIBRARIES})
+
+
+IF(ON_COBRA GREATER -1)
+  IF (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+    SET(BLA_VENDOR "Intel") #search only for Intel BLAS (=MKL)
+    SET(MKL_DIR $ENV{MKL_HOME})
+    LIST(APPEND linkedlibs -mkl=${MKLLIB} -Wl,-rpath=${MKL_DIR}/lib/intel64 )
+  ELSEIF (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    SET(BLA_VENDOR "Intel") #search only for Intel BLAS (=MKL)
+    SET(MKL_DIR $ENV{MKL_HOME})
+    LIST(APPEND linkedlibs -L${MKL_DIR}/lib/intel64 -lmkl_gf_lp64
+		-l${MKLLIBGNU} -lmkl_core -lpthread -lm -ldl
+		-Wl,-rpath=${MKL_DIR}/lib/intel64 )
+  ENDIF()
+  MESSAGE(STATUS "Using INTEL MKL BLAS/Lapack library")
+ELSE()
+  FIND_PACKAGE(LAPACK QUIET)
+  IF (LAPACK_FOUND)
+    LIST(APPEND linkedlibs ${LAPACK_LIBRARIES})
+    MESSAGE(STATUS "Using BLAS/Lapack library")
+  ELSE()
+    MESSAGE(WARNING " Lapack not found for GNU compiler!")
+  ENDIF()
 ENDIF()
 
 # =========================================================================
@@ -315,14 +346,23 @@ ENDIF()
 # =========================================================================
 # NETCDF (locally installed only!)
 # =========================================================================
-IF(HOPR_NETCDF)
-  SET(NETCDF_DIR  /usr)
+IF(HOPR_LINK_TO_NETCDF)
+  ADD_DEFINITIONS(-DPP_NETCDF=${HOPR_LINK_TO_NETCDF})
+  IF(ON_COBRA GREATER -1)
+    SET(NETCDF_DIR  $ENV{NETCDF_HOME})
+  ELSE()
+    SET(NETCDF_DIR  /usr)
+  ENDIF()
   INCLUDE_DIRECTORIES(${NETCDF_DIR}/include)
-  LIST(APPEND linkedlibs -Wl,-rpath,${NETCDF_DIR}/lib -lnetcdff -lnetcdf)
+  LIST(APPEND linkedlibs -L${NETCDF_DIR}/lib -lnetcdf -lnetcdff -Wl,-rpath,${NETCDF_DIR}/lib )
   MESSAGE(STATUS "Building HOPR with NetCDF")
+ELSE()
+  UNSET(NETCDF_DIR CACHE )
 ENDIF()
 
-IF(HOPR_GVEC)
+
+
+IF(HOPR_LINK_TO_GVEC)
   SET(HOPR_GVEC_DIR "/home/ipphinde/GIT/gvec/build" CACHE STRING "path to gvec build dir")
   ADD_DEFINITIONS(-DPP_GVEC=${HOPR_GVEC})
   
@@ -330,41 +370,47 @@ IF(HOPR_GVEC)
   INCLUDE_DIRECTORIES (${HOPR_GVEC_DIR}/include)
   MESSAGE(STATUS "Building HOPR with GVEC")
 ELSE()
-  UNSET(HOPR_GVEC_DIR)
+  UNSET(HOPR_GVEC_DIR CACHE )
 ENDIF()
 # =========================================================================
 # CGNS library
 # =========================================================================
-ADD_DEFINITIONS(-DPP_CGNS_INT=${HOPR_CGNS_INT})
-
-IF (HOPR_BUILD_CGNS)
-  SET(HOPR_CGNS_DLDIR ${HOPR_EXTERNAL_LIB_DIR}/CGNS)
-  SET(HOPR_CGNS_DIR   ${HOPR_CGNS_DLDIR}/build)
-  IF (NOT EXISTS "${HOPR_CGNS_DIR}/lib/libcgns.a")
-    STRING(COMPARE EQUAL ${HOPR_CGNS_INT} "64" HOPR_CGNS_64BIT)
-
-    ExternalProject_Add(cgns
-    GIT_REPOSITORY ${CGNSDOWNLOAD}
-    GIT_TAG ${HOPR_CGNSTAG}
-    #PATCH_COMMAND sed -i s/^c/!/g ${HOPR_CGNS_DIR}/src/cgns/src/cgnslib_f.h.in
-    PREFIX ${HOPR_CGNS_DIR}
-    CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${HOPR_CGNS_DIR}/build /
-    -DCGNS_ENABLE_FORTRAN=ON   -DCGNS_ENABLE_64BIT=${HOPR_CGNS_64BIT} -DCGNS_BUILD_SHARED=OFF -DCGNS_USE_SHARED=OFF /
-    -DCMAKE_BUILD_TYPE=Release -DCGNS_BUILD_CGNSTOOLS=OFF -DCGNS_ENABLE_HDF5=OFF -DCGNS_ENABLE_PARALLEL=OFF -DCGNS_ENABLE_TESTS=OFF -DCMAKE_SKIP_RPATH=ON
-    )
-    LIST(APPEND SELFBUILTEXTERNALS cgns)
+IF(HOPR_LINK_TO_CGNS)
+  ADD_DEFINITIONS(-DPP_CGNS=${HOPR_LINK_TO_CGNS})
+  ADD_DEFINITIONS(-DPP_CGNS_INT=${HOPR_CGNS_INT})
+  
+  IF (HOPR_BUILD_CGNS)
+    SET(HOPR_CGNS_DLDIR ${HOPR_EXTERNAL_LIB_DIR}/CGNS)
+    SET(HOPR_CGNS_DIR   ${HOPR_CGNS_DLDIR}/build)
+    IF (NOT EXISTS "${HOPR_CGNS_DIR}/lib/libcgns.a")
+      STRING(COMPARE EQUAL ${HOPR_CGNS_INT} "64" HOPR_CGNS_64BIT)
+  
+      ExternalProject_Add(cgns
+      GIT_REPOSITORY ${CGNSDOWNLOAD}
+      GIT_TAG ${HOPR_CGNSTAG}
+      #PATCH_COMMAND sed -i s/^c/!/g ${HOPR_CGNS_DIR}/src/cgns/src/cgnslib_f.h.in
+      PREFIX ${HOPR_CGNS_DIR}
+      CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${HOPR_CGNS_DIR}/build /
+      -DCGNS_ENABLE_FORTRAN=ON   -DCGNS_ENABLE_64BIT=${HOPR_CGNS_64BIT} -DCGNS_BUILD_SHARED=OFF -DCGNS_USE_SHARED=OFF /
+      -DCMAKE_BUILD_TYPE=Release -DCGNS_BUILD_CGNSTOOLS=OFF -DCGNS_ENABLE_HDF5=OFF -DCGNS_ENABLE_PARALLEL=OFF -DCGNS_ENABLE_TESTS=OFF -DCMAKE_SKIP_RPATH=ON
+      )
+      LIST(APPEND SELFBUILTEXTERNALS cgns)
+    ENDIF()
+    LIST(APPEND linkedlibs ${HOPR_CGNS_DIR}/build/lib/libcgns.a)
+    INCLUDE_DIRECTORIES(${HOPR_CGNS_DIR}/build/include)
+  ELSE()
+    FIND_PACKAGE(CGNS)
+    IF (CGNS_FOUND)
+      MESSAGE(STATUS "CGNS include dir: " ${CGNS_INCLUDE_DIR})
+      LIST(APPEND linkedlibs ${CGNS_LIBRARIES})
+      INCLUDE_DIRECTORIES (${CGNS_INCLUDE_DIR})
+   ELSE()
+      MESSAGE(ERROR "CGNS not found")
+    ENDIF()
   ENDIF()
-  LIST(APPEND linkedlibs ${HOPR_CGNS_DIR}/build/lib/libcgns.a)
-  INCLUDE_DIRECTORIES(${HOPR_CGNS_DIR}/build/include)
 ELSE()
-  FIND_PACKAGE(CGNS)
-  IF (CGNS_FOUND)
-    MESSAGE(STATUS "CGNS include dir: " ${CGNS_INCLUDE_DIR})
-    LIST(APPEND linkedlibs ${CGNS_LIBRARIES})
-    INCLUDE_DIRECTORIES (${CGNS_INCLUDE_DIR})
- ELSE()
-    MESSAGE(ERROR "CGNS not found")
-  ENDIF()
+    UNSET(HOPR_CGNS_DLDIR ) 
+    UNSET(HOPR_CGNS_DIR  )
 ENDIF()
 
 

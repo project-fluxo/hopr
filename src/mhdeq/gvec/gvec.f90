@@ -152,6 +152,9 @@ DO istep=0,nsteps-1
   CALL gvec_to_hopr(maxnode-minnode+1,xin2(:,minnode:maxnode), &
                                   x_out(:,minnode:maxnode),&
                            MHDEQdata(2:10,minnode:maxnode),phi_edge_axis,chi_edge_axis)
+#else
+  x_out=0. 
+  STOP 'gvec_to_hopr cannot be called, HOPR not linked to GVEC.'
 #endif
 
 

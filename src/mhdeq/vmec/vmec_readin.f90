@@ -89,7 +89,9 @@ SUBROUTINE ReadVMEC(fileName)
 !=====================================================================
   USE MOD_VMEC_Vars
   IMPLICIT NONE
+#ifdef PP_NETCDF
   INCLUDE "netcdf.inc"
+#endif
 ! INPUT/OUTPUT VARIABLES
   CHARACTER(LEN = *), INTENT(IN) :: fileName
 !---------------------------------------------------------------------
@@ -98,6 +100,9 @@ SUBROUTINE ReadVMEC(fileName)
 !=====================================================================
 
     WRITE(*,'(4X,A)')'VMEC READ WOUT FILE "'//TRIM(fileName)//'" ...'
+#ifndef PP_NETCDF
+    STOP 'NETCDF library not linked!'
+#else
     !! open NetCDF input file
     ioError = NF_OPEN(TRIM(fileName), NF_NOWRITE, ncid)
     IF (ioError /= 0) THEN
@@ -310,6 +315,7 @@ SUBROUTINE ReadVMEC(fileName)
 
     ioError = NF_CLOSE(ncid)
     WRITE(*,'(4X,A)')'...DONE.'
+#endif /*def PP_NETCDF*/
 
 END SUBROUTINE ReadVMEC
 

@@ -390,7 +390,7 @@ END IF
 IF(useMHDEQ)THEN
   CALL WriteAttribute(File_ID,'MHDEQdata_Version',1,IntScalar=3)
   CALL WriteAttribute(File_ID,'MHDEQdata_whichEq',1,IntScalar=whichEquilibrium)
-  CALL WriteArrayToHDF5(File_ID,'MHDEQdata_VarNames',1,(/nVarMHDEQ/),StrArray=MHDEQvarNames)
+  CALL WriteArrayToHDF5(File_ID,'MHDEQdata_VarNames',1,(/nVarMHDEQ/),StrArray=MHDEQvarNames(1:nVarMHDEQ))
   CALL WriteArrayToHDF5(File_ID,'MHDEQdata_GL',5,(/nVarMHDEQ,N+1,N+1,N+1,nElems/),RealArray=MHDEQoutdataGL)
 END IF !useMHDEQ
 

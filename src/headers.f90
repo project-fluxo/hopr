@@ -22,6 +22,7 @@
 !=================================================================================================================================
 ! cgnslib_f.h defines a parameter NULL which confilcts with the Fortran 95
 ! function NULL(). Use CGNS_header only for IO routines.
+#ifdef PP_CGNS
 MODULE CGNS_header
   USE CGNS
   IMPLICIT NONE
@@ -134,3 +135,4 @@ contains
 
 #  endif
 END MODULE CGNS_header
+#endif /*def PP_CGNS*/

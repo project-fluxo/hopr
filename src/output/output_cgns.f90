@@ -20,14 +20,16 @@
 !
 ! You should have received a copy of the GNU General Public License along with HOPR. If not, see <http://www.gnu.org/licenses/>.
 !=================================================================================================================================
-
 #include "hopr.h"
+
 MODULE MOD_Output_CGNS
 !===================================================================================================================================
 ! Module for generic data output in CGNS format
 !===================================================================================================================================
 ! MODULES
+#ifdef PP_CGNS
 USE CGNS
+#endif
 ! IMPLICIT VARIABLE HANDLING
 IMPLICIT NONE
 PRIVATE
@@ -67,6 +69,7 @@ CHARACTER(LEN=*),INTENT(IN)   :: FileString              ! Output file name
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+#ifdef PP_CGNS
 PP_CGNS_INT_TYPE   :: CGNSFile,CGNSBase,CGNSZone,CGNSCoords,CGNSsection,CGNSFlowSol,CGNSFieldInd ! ?
 PP_CGNS_INT_TYPE   :: iSize(1,1:3)  ! ?
 PP_CGNS_INT_TYPE   :: iErr  ! ?
@@ -184,9 +187,13 @@ END DO
 CALL cg_close_f(CGNSfile,iErr)
 IF (iErr .NE. CG_OK) CALL my_cg_error_exit('Error closing CGNS File.',CGNSFile)
 WRITE(UNIT_stdOut,'(A)',ADVANCE='YES')"  DONE"
+#else
+  STOP 'WriteDataToCGNS: CGNS library not linked!'
+#endif /*def PP_CGNS*/
 END SUBROUTINE WriteDataToCGNS
 
 
+#ifdef PP_CGNS
 
 
 SUBROUTINE my_cg_error_exit(ErrorMessage,CGNSFile)
@@ -218,5 +225,6 @@ WRITE(Unit_StdOut,'(A)') CGNSmessage
 CALL abort(__STAMP__, &
           'CGNS error!')
 END SUBROUTINE my_cg_error_exit
+#endif /*def PP_CGNS*/
 
 END MODULE MOD_Output_CGNS

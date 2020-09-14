@@ -37,7 +37,7 @@ INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(15, 307) !working precision
   REAL(wp), PARAMETER :: mu0   = 2.0_wp * twoPi * 1.0E-7_wp         ! V s / (A m)
 
 ! GLOBAL VARIABLES 
-LOGICAL                 :: useSFL                    !< use straight-field line coordinates
+INTEGER                 :: GVEC_SFLcoord
 CHARACTER(LEN = 256)    :: GVECdataFile
 
 !===================================================================================================================================

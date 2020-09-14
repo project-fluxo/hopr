@@ -75,13 +75,17 @@ IMPLICIT NONE
 ! OUTPUT VARIABLES
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
+INTEGER                 :: GVEC_factorSFL
 !===================================================================================================================================
 WRITE(UNIT_stdOut,'(A)')'  INIT GVEC INPUT ...'
 
 GVECdataFile=GETSTR("GVECwoutfile")
 
+GVEC_SFLcoord=GETINT("GVEC_SFLcoord","0")
+GVEC_factorSFL=GETINT("GVEC_factorSFL","4")
+
 #ifdef PP_GVEC
-CALL Init_gvec_to_hopr(GVECdataFile)
+CALL Init_gvec_to_hopr(GVECdataFile,SFLcoord_in=GVEC_SFLcoord,factorSFL_in=GVEC_factorSFL)
 #else
 STOP 'TRYING TO USE GVEC INTERFACE, BUT HOPR IS NOT LINKED TO GVEC!!!'
 #endif /*PP_GVEC*/
@@ -117,22 +121,15 @@ REAL(wp),INTENT(OUT):: x_out(3,nTotal) !! mapped x,y,z coordinates with GVEC dat
 REAL(wp),INTENT(OUT):: MHDEQdata(nVarMHDEQ,nTotal) !! vector of equilibrium variables, see definition in mhdeq_vars.f90
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
-INTEGER :: iNode,percent,minnode,maxnode,istep,nsteps,nnodes
+INTEGER :: iNode,minnode,maxnode,istep,nsteps,nnodes
 REAL(wp) :: r_p, theta,zeta,phi_int,chi_int,phi_edge_axis(2),chi_edge_axis(2),Density,phinorm,chinorm
 REAL(wp) :: xin2(3,nTotal)
 !===================================================================================================================================
 WRITE(UNIT_stdOut,'(A,I8,A,A,A)')'  MAP ', nTotal,' NODES TO GVEC DATA FROM ',TRIM(GVECdataFile),' ...'
-percent=0
 nnodes=nTotal/100
 nsteps=nTotal/nNodes+1
+CALL ProgressBar(0,nTotal)
 DO istep=0,nsteps-1
-!DO iNode=1,nTotal
-  ! output of progress in %
-!  IF((nTotal.GT.10000).AND.(MOD(iNode,(nTotal/100)).EQ.0)) THEN
-  IF(iStep.GT.0)THEN
-    percent=percent+1
-    WRITE(0,'(I4,A23,A1)',ADVANCE='NO')percent, ' % of nodes evaluated...',ACHAR(13)
-  END IF
   minNode=istep*nnodes+1
   IF(minNode.GT.nTotal) EXIT
   maxNode=MIN((istep+1)*nnodes,nTotal)
@@ -155,6 +152,9 @@ DO istep=0,nsteps-1
   CALL gvec_to_hopr(maxnode-minnode+1,xin2(:,minnode:maxnode), &
                                   x_out(:,minnode:maxnode),&
                            MHDEQdata(2:10,minnode:maxnode),phi_edge_axis,chi_edge_axis)
+#else
+  x_out=0. 
+  STOP 'gvec_to_hopr cannot be called, HOPR not linked to GVEC.'
 #endif
 
 
@@ -188,6 +188,7 @@ DO istep=0,nsteps-1
 !    MHDEQdata(8:10,iNode)=Acart(:)
 
   END DO !iNode=1,nTotal
+  CALL ProgressBar(maxNode,nTotal)
 END DO !istep
 !WRITE(UNIT_stdOut,'(A,4(1X,E12.5))')'  Rmin/Zmax, Zmin/Zmax ', Rmin,Rmax,Zmin,Zmax 
 WRITE(UNIT_stdOut,'(A,2(1X,E12.5))')'  xmin/xmax', MINVAL(x_out(1,:)),MAXVAL(x_out(1,:))
